@@ -1,7 +1,5 @@
 [deploy]
-startCommand = "npm start"
+preDeployCommand = "npx prisma migrate deploy && npx prisma db seed"
+startCommand = "node_modules/.bin/next start -p ${PORT:-3000}"
 healthcheckPath = "/"
-healthcheckTimeout = 300
-
-[[deploy.preDeployCommands]]
-command = "npx prisma migrate deploy"
+healthcheckTimeout = 120
