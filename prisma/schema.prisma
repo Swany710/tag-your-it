@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Admin users ────────────────────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // bcrypt hash
+  name      String?
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+
+// ─── Reps (serialized NFC identities) ───────────────────────
+model Rep {
+  id        Int      @id              // 1..n (maps directly to /r/1, /r/2, etc.)
+  name      String
+  phone     String?
+  email     String?
+  title     String?
+  company   String?
+  bio       String?
+  photoUrl  String?
+  calLink   String?  // booking link (Calendly, etc.)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads  Lead[]
+  events Event[]
+  tags   Tag[]
+}
+
+// ─── Physical NFC tags ───────────────────────────────────────
+model Tag {
+  id         String    @id @default(cuid())
+  uid        String?   @unique  // physical NFC chip UID (optional, for inventory)
+  label      String?            // e.g. "Rep 1 House Card"
+  type       TagType   @default(REP)
+  repId      Int?
+  jobId      String?
+  isLocked   Boolean   @default(false)
+  isActive   Boolean   @default(true)
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  rep        Rep?      @relation(fields: [repId], references: [id])
+  job        Job?      @relation(fields: [jobId], references: [id])
+}
+
+enum TagType {
+  REP         // serialized rep card
+  JOB         // job completion plaque
+  TRADESHOW   // trade show entry
+  STATIC      // general info
+}
+
+// ─── Lead capture ────────────────────────────────────────────
+model Lead {
+  id        String   @id @default(cuid())
+  repId     Int
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  city      String?
+  state     String?
+  zip       String?
+  notes     String?
+  status    LeadStatus @default(NEW)
+  source    String     @default("nfc")
+  userAgent String?
+  ip        String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  rep       Rep        @relation(fields: [repId], references: [id])
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  INSPECTION_BOOKED
+  ESTIMATE_SENT
+  WON
+  LOST
+}
+
+// ─── Analytics events ────────────────────────────────────────
+model Event {
+  id        String   @id @default(cuid())
+  repId     Int
+  type      EventType
+  meta      Json?
+  userAgent String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  rep       Rep      @relation(fields: [repId], references: [id])
+}
+
+enum EventType {
+  TAP
+  VIEW
+  SUBMIT
+  CONTACT_SAVE
+}
+
+// ─── Job completions ─────────────────────────────────────────
+model Job {
+  id              String   @id @default(cuid())
+  jobNumber       String?  @unique
+  homeownerName   String
+  address         String
+  city            String?
+  state           String?
+  zip             String?
+  phone           String?
+  email           String?
+  completionDate  DateTime?
+  shingleType     String?
+  shingleColor    String?
+  manufacturer    String?
+  warrantyYears   Int?
+  warrantyCode    String?
+  repId           Int?
+  notes           String?
+  droneVideoUrl   String?
+  photoUrls       String[] @default([])
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tags            Tag[]
+}
