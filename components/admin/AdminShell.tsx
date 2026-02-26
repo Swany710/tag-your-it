@@ -86,12 +86,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen flex flex-col bg-slate-900">
       {/* Top Nav Bar */}
-      <header className="bg-slate-950 border-b border-slate-800 sticky top-0 z-50">
+      <header className="bg-slate-950 border-b border-slate-800 sticky top-0 z-50" style={{position: 'sticky', top: 0, zIndex: 50}}>
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-6 h-16">
+          <div style={{display: 'flex', alignItems: 'center', gap: '1.5rem', height: '64px'}}>
 
             {/* Logo */}
-            <Link href="/admin" className="flex items-center gap-2.5 shrink-0 mr-2">
+            <Link href="/admin" style={{display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0, marginRight: '8px'}}>
               <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
@@ -104,7 +104,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             <div className="h-6 w-px bg-slate-800 shrink-0" />
 
             {/* Nav Items */}
-            <nav className="flex items-center gap-1 flex-1 overflow-x-auto scrollbar-hide">
+            <nav style={{display: 'flex', alignItems: 'center', gap: '4px', flex: 1, overflowX: 'auto'}}>
               {NAV.map((item) => {
                 const active = item.href === "/admin"
                   ? pathname === "/admin"
@@ -129,7 +129,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             </nav>
 
             {/* Right: user + sign out */}
-            <div className="flex items-center gap-3 shrink-0 ml-auto">
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, marginLeft: 'auto'}}>
               <div className="hidden md:block text-right">
                 <p className="text-white text-xs font-medium leading-tight truncate max-w-[140px]">
                   {session.user?.name ?? session.user?.email?.split("@")[0]}
