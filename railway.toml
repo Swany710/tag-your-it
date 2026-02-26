@@ -1,5 +1,5 @@
 [deploy]
-preDeployCommand = "npx prisma migrate deploy && npx prisma db seed"
+preDeployCommand = "npx prisma db push --accept-data-loss && npx prisma db seed"
 startCommand = "node_modules/.bin/next start -p ${PORT:-3000}"
 healthcheckPath = "/"
 healthcheckTimeout = 120
