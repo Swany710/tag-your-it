@@ -119,6 +119,21 @@ enum EventType {
   CONTACT_SAVE
 }
 
+// ─── Customer-facing deals/promo page (singleton, id=1) ──────
+model DealPage {
+  id          Int      @id @default(1)  // singleton — always upsert on id=1
+  isLive      Boolean  @default(true)
+  badge       String   @default("Limited Time Offer")
+  headline    String   @default("Special Offer for You")
+  subheadline String?
+  body        String?  // multi-line deal details / description
+  ctaText     String   @default("Get a Free Quote")
+  ctaUrl      String   @default("")
+  companyName String   @default("Tag Your It")
+  logoUrl     String?  // optional logo image URL
+  updatedAt   DateTime @updatedAt
+}
+
 // ─── Job completions ─────────────────────────────────────────
 model Job {
   id              String   @id @default(cuid())
