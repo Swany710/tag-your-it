@@ -1,0 +1,7 @@
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+
+[[deploy.preDeployCommands]]
+command = "npx prisma migrate deploy"
