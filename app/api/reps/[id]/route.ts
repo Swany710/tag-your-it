@@ -29,7 +29,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
 
-  const allowed = ["name", "phone", "email", "title", "company", "bio", "photoUrl", "calLink", "isActive"];
+  const allowed = ["name", "phone", "email", "title", "company", "bio", "photoUrl", "calLink", "isActive", "redirectUrl"];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in body) data[key] = body[key];

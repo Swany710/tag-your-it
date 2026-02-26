@@ -32,8 +32,9 @@ model Rep {
   company   String?
   bio       String?
   photoUrl  String?
-  calLink   String?  // booking link (Calendly, etc.)
-  isActive  Boolean  @default(true)
+  calLink      String?  // booking link (Calendly, etc.)
+  redirectUrl  String?  // if set, tap redirects here instead of showing profile
+  isActive     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
