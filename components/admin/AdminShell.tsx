@@ -56,7 +56,7 @@ const NAV = [
     label: "Jobs",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
       </svg>
     ),
   },
@@ -75,7 +75,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
         <div className="text-slate-400">Loading...</div>
       </div>
     );
@@ -84,61 +84,75 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   if (!session) return null;
 
   return (
-    <div className="min-h-screen flex bg-slate-900">
-      {/* Sidebar */}
-      <aside className="w-60 bg-slate-950 border-r border-slate-800 flex flex-col">
-        <div className="p-5 border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-white font-semibold text-sm">Tap System</p>
-              <p className="text-slate-500 text-xs">Admin</p>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen flex flex-col bg-slate-900">
+      {/* Top Nav Bar */}
+      <header className="bg-slate-950 border-b border-slate-800 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center gap-6 h-16">
 
-        <nav className="flex-1 p-3 space-y-1">
-          {NAV.map((item) => {
-            const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-orange-500/15 text-orange-400"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800"
-                }`}
+            {/* Logo */}
+            <Link href="/admin" className="flex items-center gap-2.5 shrink-0 mr-2">
+              <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+                </svg>
+              </div>
+              <span className="text-white font-semibold text-sm hidden sm:block">Tap System</span>
+            </Link>
+
+            {/* Divider */}
+            <div className="h-6 w-px bg-slate-800 shrink-0" />
+
+            {/* Nav Items */}
+            <nav className="flex items-center gap-1 flex-1 overflow-x-auto scrollbar-hide">
+              {NAV.map((item) => {
+                const active = item.href === "/admin"
+                  ? pathname === "/admin"
+                  : pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150 ${
+                      active
+                        ? "bg-orange-500/20 text-orange-400 shadow-sm"
+                        : "text-slate-400 hover:text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    <span className={active ? "text-orange-400" : "text-slate-500"}>
+                      {item.icon}
+                    </span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Right: user + sign out */}
+            <div className="flex items-center gap-3 shrink-0 ml-auto">
+              <div className="hidden md:block text-right">
+                <p className="text-white text-xs font-medium leading-tight truncate max-w-[140px]">
+                  {session.user?.name ?? session.user?.email?.split("@")[0]}
+                </p>
+                <p className="text-slate-500 text-xs truncate max-w-[140px]">{session.user?.email}</p>
+              </div>
+              <button
+                onClick={() => signOut({ callbackUrl: "/admin/login" })}
+                title="Sign out"
+                className="flex items-center gap-1.5 px-3 py-2 text-slate-400 hover:text-white text-sm rounded-lg hover:bg-slate-800 transition-colors border border-slate-800 hover:border-slate-700"
               >
-                {item.icon}
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span className="hidden sm:block">Sign out</span>
+              </button>
+            </div>
 
-        <div className="p-3 border-t border-slate-800">
-          <div className="px-3 py-2 mb-2">
-            <p className="text-white text-sm font-medium truncate">{session.user?.name ?? session.user?.email}</p>
-            <p className="text-slate-500 text-xs truncate">{session.user?.email}</p>
           </div>
-          <button
-            onClick={() => signOut({ callbackUrl: "/admin/login" })}
-            className="w-full flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-white text-sm rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Sign out
-          </button>
         </div>
-      </aside>
+      </header>
 
-      {/* Main */}
+      {/* Page Content */}
       <main className="flex-1 overflow-auto">
         {children}
       </main>
