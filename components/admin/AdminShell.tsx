@@ -92,7 +92,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
             {/* Logo */}
             <Link href="/admin" style={{display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0, marginRight: '8px'}}>
-              <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+              <div style={{width: '32px', height: '32px', borderRadius: '8px', background: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
                 </svg>
@@ -101,7 +101,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             </Link>
 
             {/* Divider */}
-            <div className="h-6 w-px bg-slate-800 shrink-0" />
+            <div style={{height: '24px', width: '1px', background: '#1e293b', flexShrink: 0}} />
 
             {/* Nav Items */}
             <nav style={{display: 'flex', alignItems: 'center', gap: '4px', flex: 1, overflowX: 'auto'}}>
@@ -113,13 +113,24 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150 ${
-                      active
-                        ? "bg-orange-500/20 text-orange-400 shadow-sm"
-                        : "text-slate-400 hover:text-white hover:bg-slate-800"
-                    }`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      whiteSpace: 'nowrap',
+                      textDecoration: 'none',
+                      transition: 'background 0.15s, color 0.15s',
+                      background: active ? 'rgba(249,115,22,0.15)' : 'transparent',
+                      color: active ? '#fb923c' : '#94a3b8',
+                    }}
+                    onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = 'rgb(30,41,59)'; (e.currentTarget as HTMLElement).style.color = '#fff'; } }}
+                    onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#94a3b8'; } }}
                   >
-                    <span className={active ? "text-orange-400" : "text-slate-500"}>
+                    <span style={{color: active ? '#fb923c' : '#64748b', display: 'flex'}}>
                       {item.icon}
                     </span>
                     <span>{item.label}</span>
