@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
-export const revalidate = 0; // always fetch fresh
+export const dynamic = "force-dynamic";
 
 export default async function DealsPage() {
   const page = await prisma.dealPage.findUnique({ where: { id: 1 } });

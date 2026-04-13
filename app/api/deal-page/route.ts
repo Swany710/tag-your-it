@@ -3,13 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// GET /api/deal-page — public: fetch current deals page content
+export const dynamic = "force-dynamic";
+
+// GET /api/deal-page - public: fetch current deals page content
 export async function GET() {
   const page = await prisma.dealPage.findUnique({ where: { id: 1 } });
   return NextResponse.json({ page });
 }
 
-// PUT /api/deal-page — admin: update deals page content
+// PUT /api/deal-page - admin: update deals page content
 export async function PUT(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
