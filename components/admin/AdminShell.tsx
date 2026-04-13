@@ -1,49 +1,52 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
+import { SessionProvider, signOut, useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
 
 const NAV = [
-  { href: "/admin",           label: "Dashboard", icon: "📊" },
-  { href: "/admin/reps",      label: "Reps",       icon: "👥" },
-  { href: "/admin/leads",     label: "Leads",      icon: "📋" },
-  { href: "/admin/analytics", label: "Analytics",  icon: "📈" },
-  { href: "/admin/tags",      label: "Tags",       icon: "🏷️" },
-  { href: "/admin/deals",     label: "Deals",      icon: "🎯" },
-  { href: "/admin/jobs",      label: "Jobs",       icon: "🏠" },
+  { href: "/admin", label: "Dashboard", icon: "📊" },
+  { href: "/admin/reps", label: "Reps", icon: "👥" },
+  { href: "/admin/leads", label: "Leads", icon: "📋" },
+  { href: "/admin/analytics", label: "Analytics", icon: "📈" },
+  { href: "/admin/tags", label: "Tags", icon: "🏷️" },
+  { href: "/admin/deals", label: "Deals", icon: "🎯" },
+  { href: "/admin/jobs", label: "Jobs", icon: "🏠" },
 ];
 
-export default function AdminShell({ children }: { children: React.ReactNode }) {
+function AdminShellContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/admin";
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/admin/login");
+      router.replace("/admin/login");
     }
-  }, [status, router]);
+  }, [router, status]);
 
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="text-slate-400 text-sm">Loading...</div>
+        <div className="text-slate-400 text-sm">Loading admin...</div>
       </div>
     );
   }
 
-  if (!session) return null;
+  if (!session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="text-slate-500 text-sm">Redirecting to login...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-900">
-      {/* Top nav */}
       <header className="bg-slate-950 border-b border-slate-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 h-16">
-
-            {/* Logo */}
             <Link href="/admin" className="flex items-center gap-2 flex-shrink-0 mr-2">
               <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white text-sm font-bold">
                 T
@@ -53,21 +56,15 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
             <div className="w-px h-6 bg-slate-800 flex-shrink-0" />
 
-            {/* Nav */}
             <nav className="flex items-center gap-1 flex-1 overflow-x-auto">
               {NAV.map((item) => {
-                const active =
-                  item.href === "/admin"
-                    ? pathname === "/admin"
-                    : pathname.startsWith(item.href);
+                const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                      active
-                        ? "bg-orange-500/15 text-orange-400"
-                        : "text-slate-400 hover:text-white hover:bg-slate-800"
+                      active ? "bg-orange-500/15 text-orange-400" : "text-slate-400 hover:text-white hover:bg-slate-800"
                     }`}
                   >
                     <span>{item.icon}</span>
@@ -77,7 +74,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               })}
             </nav>
 
-            {/* User + sign out */}
             <div className="flex items-center gap-3 flex-shrink-0 ml-auto">
               <p className="text-slate-400 text-xs hidden md:block truncate max-w-[140px]">
                 {session.user?.email}
@@ -89,15 +85,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 Sign out
               </button>
             </div>
-
           </div>
         </div>
       </header>
 
-      {/* Page content */}
-      <main className="flex-1 overflow-auto">
-        {children}
-      </main>
+      <main className="flex-1 overflow-auto">{children}</main>
     </div>
+  );
+}
+
+export default function AdminShell({ children }: { children: React.ReactNode }) {
+  return (
+    <SessionProvider refetchOnWindowFocus={false}>
+      <AdminShellContent>{children}</AdminShellContent>
+    </SessionProvider>
   );
 }
