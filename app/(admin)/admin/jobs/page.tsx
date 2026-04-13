@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import AdminShell from "@/components/admin/AdminShell";
-import Link from "next/link";
 
 interface Job {
   id: string;
@@ -18,24 +17,31 @@ interface Job {
   tags: { id: string }[];
 }
 
+const EMPTY_FORM = {
+  homeownerName: "", address: "", city: "", state: "", zip: "",
+  phone: "", email: "", completionDate: "", shingleType: "",
+  shingleColor: "", manufacturer: "", warrantyYears: "", jobNumber: "",
+};
+
 export default function JobsPage() {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs]       = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    homeownerName: "", address: "", city: "", state: "", zip: "",
-    phone: "", email: "", completionDate: "", shingleType: "",
-    shingleColor: "", manufacturer: "", warrantyYears: "", jobNumber: "",
-  });
+  const [saving, setSaving]   = useState(false);
+  const [form, setForm]       = useState(EMPTY_FORM);
+
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   useEffect(() => {
     fetch("/api/jobs")
       .then((r) => r.json())
-      .then((d) => { setJobs(d.jobs ?? []); setLoading(false); });
+      .then((d) => { setJobs(d.jobs ?? []); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
-  function update(k: string, v: string) { setForm((f) => ({ ...f, [k]: v })); }
+  function update(k: string, v: string) {
+    setForm((f) => ({ ...f, [k]: v }));
+  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -49,22 +55,25 @@ export default function JobsPage() {
       const data = await res.json();
       setJobs((j) => [{ ...data.job, tags: [] }, ...j]);
       setShowNew(false);
-      setForm({ homeownerName: "", address: "", city: "", state: "", zip: "", phone: "", email: "", completionDate: "", shingleType: "", shingleColor: "", manufacturer: "", warrantyYears: "", jobNumber: "" });
+      setForm(EMPTY_FORM);
     }
     setSaving(false);
   }
 
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-
   return (
     <AdminShell>
-      <div className="p-8">
+      <div className="p-8 max-w-5xl mx-auto">
+
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Job Completions</h1>
-            <p className="text-slate-400 text-sm mt-1">{jobs.length} jobs recorded · Each gets a permanent NFC plaque</p>
+            <p className="text-slate-400 text-sm mt-1">
+              {jobs.length} jobs · Each gets a permanent NFC plaque
+            </p>
           </div>
-          <button onClick={() => setShowNew(true)} className="btn-primary">+ Add Job</button>
+          <button onClick={() => setShowNew(!showNew)} className="btn-primary">
+            {showNew ? "Cancel" : "+ Add Job"}
+          </button>
         </div>
 
         {showNew && (
@@ -127,22 +136,26 @@ export default function JobsPage() {
                     <p className="text-white font-semibold">{job.homeownerName}</p>
                     {job.jobNumber && <span className="text-slate-500 text-xs font-mono">#{job.jobNumber}</span>}
                   </div>
-                  <p className="text-slate-400 text-sm">{job.address}{job.city ? `, ${job.city}` : ""}{job.state ? ` ${job.state}` : ""}</p>
+                  <p className="text-slate-400 text-sm">
+                    {job.address}{job.city ? `, ${job.city}` : ""}{job.state ? ` ${job.state}` : ""}
+                  </p>
                   <p className="text-slate-600 text-xs mt-0.5">
-                    {job.shingleType ?? "—"} · {job.shingleColor ?? "—"} · {job.warrantyYears ? `${job.warrantyYears}yr warranty` : "—"}
+                    {job.shingleType ?? "—"} · {job.shingleColor ?? "—"}
+                    {job.warrantyYears ? ` · ${job.warrantyYears}yr warranty` : ""}
                     {job.completionDate ? ` · ${new Date(job.completionDate).toLocaleDateString()}` : ""}
                   </p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-orange-400 font-mono text-xs">{baseUrl}/job/{job.id}</p>
-                  <p className="text-slate-600 text-xs mt-1">{job.tags.length} tag{job.tags.length !== 1 ? "s" : ""} linked</p>
+                  <p className="text-slate-600 text-xs mt-1">{job.tags.length} tag{job.tags.length !== 1 ? "s" : ""}</p>
                 </div>
               </div>
             ))}
             {jobs.length === 0 && (
               <div className="card text-center py-12">
-                <p className="text-slate-400 mb-2">No jobs yet.</p>
-                <p className="text-slate-600 text-sm">Add a job completion record and link it to an NFC plaque.</p>
+                <p className="text-4xl mb-3">🏠</p>
+                <p className="text-slate-400 mb-1">No jobs yet.</p>
+                <p className="text-slate-600 text-sm">Add a completed job to link it to an NFC plaque.</p>
               </div>
             )}
           </div>

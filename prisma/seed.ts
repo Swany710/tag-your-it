@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // Create admin user
+  // ── Admin user ────────────────────────────────────────────
   const password = process.env.ADMIN_PASSWORD ?? "changeme123!";
   const hash = await bcrypt.hash(password, 12);
 
@@ -20,45 +20,41 @@ async function main() {
       role: "SUPER_ADMIN",
     },
   });
+  console.log(`✅ Admin: eswanberg0@gmail.com / ${password}`);
 
-  console.log(`✅ Admin user: eswanberg0@gmail.com / ${password}`);
-  console.log("   ⚠️  Change this password immediately in production!");
-
-  // Create 4 test reps
-  const reps = [
-    { id: 1, name: "Rep One", phone: "555-111-1111", email: "rep1@example.com", title: "Project Manager", company: "Swany Roofing" },
-    { id: 2, name: "Rep Two", phone: "555-222-2222", email: "rep2@example.com", title: "Sales Rep", company: "Swany Roofing" },
-    { id: 3, name: "Rep Three", phone: "555-333-3333", email: "rep3@example.com", title: "Sales Rep", company: "Swany Roofing" },
-    { id: 4, name: "Rep Four", phone: "555-444-4444", email: "rep4@example.com", title: "Sales Rep", company: "Swany Roofing" },
-  ];
-
-  for (const rep of reps) {
+  // ── 25 Rep slots ─────────────────────────────────────────
+  // Uses upsert — existing reps with real data will NOT be overwritten.
+  // New slots are created as inactive placeholders ready to be assigned.
+  for (let i = 1; i <= 25; i++) {
     await prisma.rep.upsert({
-      where: { id: rep.id },
-      update: rep,
-      create: rep,
-    });
-    console.log(`✅ Rep #${rep.id}: ${rep.name} → /r/${rep.id}`);
-  }
-
-  // Register their tags in inventory
-  for (const rep of reps) {
-    await prisma.tag.upsert({
-      where: { uid: `test-rep-${rep.id}` },
+      where: { id: i },
       update: {},
       create: {
-        uid: `test-rep-${rep.id}`,
-        label: `${rep.name} House Card`,
+        id: i,
+        name: `Rep ${i}`,
+        title: "Sales Rep",
+        company: "Swany Roofing",
+        isActive: false,
+      },
+    });
+
+    // Register a tag in inventory for each slot
+    await prisma.tag.upsert({
+      where: { uid: `rep-slot-${i}` },
+      update: {},
+      create: {
+        uid: `rep-slot-${i}`,
+        label: `Rep ${i} House Card`,
         type: "REP",
-        repId: rep.id,
-        notes: "38mm NTAG216 wet inlay — test phase",
+        repId: i,
+        notes: "NTAG216 38mm wet inlay",
       },
     });
   }
 
-  console.log("\n📡 NFC Tag URLs:");
-  console.log("   /r/1  /r/2  /r/3  /r/4");
-  console.log("\nReplace these with your actual domain when live.");
+  console.log("✅ 25 rep slots seeded (IDs 1–25)");
+  console.log("📡 NFC URLs: /r/1 through /r/25");
+  console.log("\n⚠️  Edit each rep in the admin dashboard to assign real names/info.");
 }
 
 main()

@@ -26,16 +26,18 @@ interface Rep {
 }
 
 export default function TagsPage() {
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [reps, setReps] = useState<Rep[]>([]);
+  const [tags, setTags]   = useState<Tag[]>([]);
+  const [reps, setReps]   = useState<Rep[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // New tag form
   const [showNew, setShowNew] = useState(false);
   const [form, setForm] = useState({ uid: "", label: "", type: "REP", repId: "", notes: "" });
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving]   = useState(false);
 
-  // Redirect URL editing
-  const [editingRepId, setEditingRepId] = useState<number | null>(null);
-  const [editUrl, setEditUrl] = useState("");
+  // Redirect editing
+  const [editingRepId, setEditingRepId]   = useState<number | null>(null);
+  const [editUrl, setEditUrl]             = useState("");
   const [savingRedirect, setSavingRedirect] = useState(false);
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
@@ -48,10 +50,10 @@ export default function TagsPage() {
       setTags(tagData.tags ?? []);
       setReps((repData.reps ?? []).filter((r: Rep) => r.isActive));
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
   }, []);
 
-  function getTagUrl(tag: Tag) {
+  function tagUrl(tag: Tag) {
     if (tag.type === "REP" && tag.repId) return `${baseUrl}/r/${tag.repId}`;
     if (tag.type === "JOB" && tag.jobId) return `${baseUrl}/job/${tag.jobId}`;
     return "—";
@@ -74,11 +76,6 @@ export default function TagsPage() {
     setSaving(false);
   }
 
-  function startEditRedirect(rep: Rep) {
-    setEditingRepId(rep.id);
-    setEditUrl(rep.redirectUrl ?? "");
-  }
-
   async function saveRedirect(repId: number) {
     setSavingRedirect(true);
     const url = editUrl.trim();
@@ -87,12 +84,9 @@ export default function TagsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ redirectUrl: url || null }),
     });
-    if (res.ok) {
-      setReps((rs) => rs.map((r) => r.id === repId ? { ...r, redirectUrl: url || null } : r));
-    }
+    if (res.ok) setReps((rs) => rs.map((r) => r.id === repId ? { ...r, redirectUrl: url || null } : r));
     setSavingRedirect(false);
     setEditingRepId(null);
-    setEditUrl("");
   }
 
   async function clearRedirect(repId: number) {
@@ -101,167 +95,133 @@ export default function TagsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ redirectUrl: null }),
     });
-    if (res.ok) {
-      setReps((rs) => rs.map((r) => r.id === repId ? { ...r, redirectUrl: null } : r));
-    }
+    if (res.ok) setReps((rs) => rs.map((r) => r.id === repId ? { ...r, redirectUrl: null } : r));
   }
 
   return (
     <AdminShell>
-      <div className="p-8">
+      <div className="p-8 max-w-5xl mx-auto">
 
-        {/* ── Tag Redirect URLs ─────────────────────────────── */}
+        {/* ── Redirect URLs ───────────────────────────────────── */}
         <div className="mb-10">
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold text-white">Tag Redirect URLs</h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Redirect any tap to a custom URL — promotions, deals, landing pages. Clear it to go back to the rep&apos;s profile page.
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold text-white mb-1">Tag Redirect URLs</h1>
+          <p className="text-slate-400 text-sm mb-5">
+            Override any rep tap to redirect to a custom URL — promotions, deals, landing pages.
+          </p>
 
           {loading ? (
             <div className="text-slate-400 text-sm">Loading...</div>
           ) : (
             <div className="space-y-3">
               {reps.map((rep) => {
-                const tapUrl = `${baseUrl}/r/${rep.id}`;
+                const tapUrl    = `${baseUrl}/r/${rep.id}`;
                 const isEditing = editingRepId === rep.id;
                 const hasRedirect = !!rep.redirectUrl;
 
                 return (
-                  <div key={rep.id} className="card" style={{borderColor: hasRedirect ? 'rgba(249,115,22,0.4)' : undefined}}>
-                    <div style={{display:'flex', alignItems:'flex-start', gap:'16px', flexWrap:'wrap'}}>
+                  <div key={rep.id} className={`card ${hasRedirect ? "border-orange-500/40" : ""}`}>
+                    <div className="flex items-center gap-4 flex-wrap">
 
-                      {/* Rep info */}
-                      <div style={{flex:'0 0 auto', minWidth:'120px'}}>
-                        <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
-                          <div style={{width:'32px', height:'32px', borderRadius:'50%', background:'rgba(249,115,22,0.2)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fb923c', fontWeight:700, fontSize:'13px', flexShrink:0}}>
-                            {rep.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="text-white text-sm font-semibold">{rep.name}</p>
-                            <p className="text-slate-500 text-xs">Rep #{rep.id}</p>
-                          </div>
+                      {/* Rep */}
+                      <div className="flex items-center gap-2 min-w-[130px]">
+                        <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-sm">
+                          {rep.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-white text-sm font-semibold leading-tight">{rep.name}</p>
+                          <p className="text-slate-500 text-xs">Rep #{rep.id}</p>
                         </div>
                       </div>
 
-                      {/* Tap URL (read-only) */}
-                      <div style={{flex:'0 0 auto'}}>
-                        <p className="text-slate-500 text-xs mb-1">Tap URL (never changes)</p>
-                        <div style={{display:'flex', alignItems:'center', gap:'6px'}}>
-                          <code className="text-orange-400 text-xs font-mono bg-slate-800 px-2 py-1 rounded">{tapUrl}</code>
-                          <button
-                            onClick={() => navigator.clipboard.writeText(tapUrl)}
-                            title="Copy"
-                            style={{background:'rgba(100,116,139,0.2)', border:'none', borderRadius:'4px', padding:'4px 6px', cursor:'pointer', color:'#94a3b8', fontSize:'11px'}}
-                          >
-                            📋
-                          </button>
-                        </div>
+                      {/* Tap URL */}
+                      <div className="flex items-center gap-2">
+                        <code className="text-orange-400 text-xs font-mono bg-slate-800 px-2 py-1 rounded">{tapUrl}</code>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(tapUrl)}
+                          className="text-slate-500 hover:text-white text-xs bg-slate-800 px-2 py-1 rounded"
+                          title="Copy"
+                        >
+                          📋
+                        </button>
                       </div>
 
-                      {/* Arrow */}
-                      <div style={{flex:'0 0 auto', color:'#475569', fontSize:'18px', paddingTop:'18px'}}>→</div>
+                      <span className="text-slate-600">→</span>
 
-                      {/* Current destination */}
-                      <div style={{flex:'1', minWidth:'200px'}}>
-                        <p className="text-slate-500 text-xs mb-1">Currently points to</p>
+                      {/* Destination */}
+                      <div className="flex-1 min-w-[180px]">
                         {isEditing ? (
-                          <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
+                          <div className="flex gap-2 flex-wrap">
                             <input
-                              className="input text-sm"
-                              style={{flex:'1', minWidth:'200px'}}
+                              className="input text-sm flex-1 min-w-[200px]"
                               value={editUrl}
                               onChange={(e) => setEditUrl(e.target.value)}
-                              placeholder="https://yoursite.com/deal or leave blank for rep page"
+                              placeholder="https://... (blank = rep profile)"
                               autoFocus
-                              onKeyDown={(e) => { if (e.key === 'Enter') saveRedirect(rep.id); if (e.key === 'Escape') setEditingRepId(null); }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") saveRedirect(rep.id);
+                                if (e.key === "Escape") setEditingRepId(null);
+                              }}
                             />
-                            <button
-                              onClick={() => saveRedirect(rep.id)}
-                              disabled={savingRedirect}
-                              className="btn-primary text-sm"
-                              style={{whiteSpace:'nowrap'}}
-                            >
+                            <button onClick={() => saveRedirect(rep.id)} disabled={savingRedirect} className="btn-primary text-sm">
                               {savingRedirect ? "Saving…" : "Save"}
                             </button>
-                            <button
-                              onClick={() => setEditingRepId(null)}
-                              className="btn-secondary text-sm"
-                            >
-                              Cancel
-                            </button>
+                            <button onClick={() => setEditingRepId(null)} className="btn-secondary text-sm">Cancel</button>
                           </div>
                         ) : (
-                          <div style={{display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap'}}>
+                          <div className="flex items-center gap-2 flex-wrap">
                             {hasRedirect ? (
-                              <a
-                                href={rep.redirectUrl!}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-orange-400 hover:underline text-sm font-mono"
-                                style={{wordBreak:'break-all'}}
-                              >
+                              <a href={rep.redirectUrl!} target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline text-sm font-mono break-all">
                                 {rep.redirectUrl}
                               </a>
                             ) : (
-                              <span className="text-slate-400 text-sm italic">Rep profile page (default)</span>
+                              <span className="text-slate-400 text-sm italic">Rep profile (default)</span>
                             )}
                           </div>
                         )}
                       </div>
 
-                      {/* Status + Actions */}
+                      {/* Actions */}
                       {!isEditing && (
-                        <div style={{flex:'0 0 auto', display:'flex', alignItems:'center', gap:'8px'}}>
-                          <span style={{
-                            fontSize:'11px', fontWeight:600, padding:'3px 8px', borderRadius:'9999px',
-                            background: hasRedirect ? 'rgba(249,115,22,0.15)' : 'rgba(100,116,139,0.2)',
-                            color: hasRedirect ? '#fb923c' : '#64748b',
-                          }}>
-                            {hasRedirect ? '🔀 Redirecting' : '✅ Direct'}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${hasRedirect ? "bg-orange-500/15 text-orange-400" : "bg-slate-700 text-slate-400"}`}>
+                            {hasRedirect ? "🔀 Redirect" : "✅ Direct"}
                           </span>
                           <button
-                            onClick={() => startEditRedirect(rep)}
+                            onClick={() => { setEditingRepId(rep.id); setEditUrl(rep.redirectUrl ?? ""); }}
                             className="btn-secondary text-xs"
-                            style={{padding:'4px 10px'}}
                           >
-                            {hasRedirect ? 'Change' : 'Set Redirect'}
+                            {hasRedirect ? "Change" : "Set Redirect"}
                           </button>
                           {hasRedirect && (
                             <button
                               onClick={() => clearRedirect(rep.id)}
-                              style={{background:'rgba(239,68,68,0.15)', border:'1px solid rgba(239,68,68,0.3)', color:'#f87171', borderRadius:'6px', padding:'4px 10px', fontSize:'12px', cursor:'pointer'}}
+                              className="text-xs px-2 py-1.5 rounded-lg bg-red-900/30 text-red-400 border border-red-900/50 hover:bg-red-900/50 transition-colors"
                             >
                               Clear
                             </button>
                           )}
                         </div>
                       )}
-
                     </div>
                   </div>
                 );
               })}
-              {reps.length === 0 && (
-                <p className="text-slate-500 text-sm">No active reps found.</p>
-              )}
+              {reps.length === 0 && <p className="text-slate-500 text-sm">No active reps found.</p>}
             </div>
           )}
         </div>
 
-        {/* ── Tag Inventory ─────────────────────────────────── */}
-        <div className="flex items-center justify-between mb-6">
+        {/* ── Tag Inventory ───────────────────────────────────── */}
+        <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-xl font-bold text-white">Tag Inventory</h2>
-            <p className="text-slate-400 text-sm mt-1">{tags.length} tags registered</p>
+            <p className="text-slate-400 text-sm mt-0.5">{tags.length} tags registered</p>
           </div>
           <button onClick={() => setShowNew(true)} className="btn-primary">+ Register Tag</button>
         </div>
 
-        {/* New tag form */}
         {showNew && (
-          <div className="card mb-6 border-orange-500">
+          <div className="card mb-5 border-orange-500/50">
             <h3 className="text-white font-semibold mb-4">Register New Tag</h3>
             <form onSubmit={handleCreate} className="grid grid-cols-2 gap-4">
               <div>
@@ -283,11 +243,11 @@ export default function TagsPage() {
               </div>
               <div>
                 <label className="label">Rep ID (if REP type)</label>
-                <input type="number" className="input" value={form.repId} onChange={(e) => setForm((f) => ({ ...f, repId: e.target.value }))} placeholder="1" />
+                <input type="number" className="input" value={form.repId} onChange={(e) => setForm((f) => ({ ...f, repId: e.target.value }))} placeholder="1" min={1} max={25} />
               </div>
               <div className="col-span-2">
                 <label className="label">Notes</label>
-                <input className="input" value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} placeholder="Which 3D print, trade show, etc." />
+                <input className="input" value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} placeholder="e.g. 3D printed house card, trade show batch" />
               </div>
               <div className="col-span-2 flex gap-3">
                 <button type="submit" className="btn-primary" disabled={saving}>{saving ? "Saving..." : "Register"}</button>
@@ -304,40 +264,32 @@ export default function TagsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-slate-400 text-left border-b border-slate-800">
-                  <th className="pb-3 pr-6">Label</th>
-                  <th className="pb-3 pr-6">Type</th>
-                  <th className="pb-3 pr-6">Points To</th>
-                  <th className="pb-3 pr-6">URL</th>
-                  <th className="pb-3 pr-6">Status</th>
+                  <th className="pb-3 pr-4">Label</th>
+                  <th className="pb-3 pr-4">Type</th>
+                  <th className="pb-3 pr-4">Points To</th>
+                  <th className="pb-3 pr-4">URL</th>
                   <th className="pb-3">UID</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
                 {tags.map((tag) => (
                   <tr key={tag.id} className="text-white">
-                    <td className="py-3 pr-6 font-medium">{tag.label ?? "Unlabeled"}</td>
-                    <td className="py-3 pr-6">
+                    <td className="py-3 pr-4 font-medium">{tag.label ?? "Unlabeled"}</td>
+                    <td className="py-3 pr-4">
                       <span className="badge bg-slate-700 text-slate-300">{tag.type}</span>
                     </td>
-                    <td className="py-3 pr-6 text-slate-400">
-                      {tag.rep?.name ?? tag.job?.homeownerName ?? "—"}
-                    </td>
-                    <td className="py-3 pr-6">
-                      <a href={getTagUrl(tag)} target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline font-mono text-xs">
-                        {getTagUrl(tag)}
+                    <td className="py-3 pr-4 text-slate-400">{tag.rep?.name ?? tag.job?.homeownerName ?? "—"}</td>
+                    <td className="py-3 pr-4">
+                      <a href={tagUrl(tag)} target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline font-mono text-xs">
+                        {tagUrl(tag)}
                       </a>
-                    </td>
-                    <td className="py-3 pr-6">
-                      <span className={`badge ${tag.isLocked ? "bg-purple-900 text-purple-300" : "bg-yellow-900 text-yellow-300"}`}>
-                        {tag.isLocked ? "Locked" : "Unlocked"}
-                      </span>
                     </td>
                     <td className="py-3 text-slate-600 font-mono text-xs">{tag.uid ?? "—"}</td>
                   </tr>
                 ))}
                 {tags.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-500">No tags registered yet.</td>
+                    <td colSpan={5} className="py-8 text-center text-slate-500">No tags registered.</td>
                   </tr>
                 )}
               </tbody>

@@ -8,17 +8,10 @@ import Link from "next/link";
 export default function NewRepPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [form, setForm] = useState({
-    id: "",
-    name: "",
-    phone: "",
-    email: "",
-    title: "",
-    company: "",
-    bio: "",
-    photoUrl: "",
-    calLink: "",
+  const [error, setError]   = useState("");
+  const [form, setForm]     = useState({
+    id: "", name: "", phone: "", email: "",
+    title: "", company: "", bio: "", photoUrl: "", calLink: "",
   });
 
   function update(key: string, val: string) {
@@ -47,10 +40,12 @@ export default function NewRepPage() {
 
   return (
     <AdminShell>
-      <div className="p-8 max-w-2xl">
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/admin/reps" className="text-slate-400 hover:text-white">← Back</Link>
-          <h1 className="text-2xl font-bold text-white">New Rep</h1>
+      <div className="p-8 max-w-2xl mx-auto">
+
+        <div className="flex items-center gap-3 mb-6">
+          <Link href="/admin/reps" className="text-slate-400 hover:text-white text-sm">← Back</Link>
+          <span className="text-slate-700">/</span>
+          <h1 className="text-xl font-bold text-white">New Rep</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="card space-y-5">
@@ -60,7 +55,7 @@ export default function NewRepPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">Rep ID (number) *</label>
+              <label className="label">Rep ID (1–25) *</label>
               <input
                 type="number"
                 className="input"
@@ -68,9 +63,10 @@ export default function NewRepPage() {
                 onChange={(e) => update("id", e.target.value)}
                 placeholder="1"
                 min={1}
+                max={25}
                 required
               />
-              <p className="text-slate-500 text-xs mt-1">This maps to /r/1 on the NFC tag URL</p>
+              <p className="text-slate-500 text-xs mt-1">Maps to /r/{form.id || "1"} on the NFC tag</p>
             </div>
             <div>
               <label className="label">Full Name *</label>
@@ -115,7 +111,7 @@ export default function NewRepPage() {
             <input className="input" value={form.calLink} onChange={(e) => update("calLink", e.target.value)} placeholder="https://calendly.com/..." />
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-1">
             <button type="submit" className="btn-primary" disabled={saving}>
               {saving ? "Creating..." : "Create Rep"}
             </button>

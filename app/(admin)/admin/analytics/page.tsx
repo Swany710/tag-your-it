@@ -10,18 +10,19 @@ interface AnalyticsData {
 }
 
 export default function AnalyticsPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [days, setDays] = useState(30);
+  const [data, setData]       = useState<AnalyticsData | null>(null);
+  const [days, setDays]       = useState(30);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     fetch(`/api/events?days=${days}`)
       .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); });
+      .then((d) => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
   }, [days]);
 
-  // Group byRep data
+  // Build per-rep map
   const repMap: Record<number, Record<string, number>> = {};
   if (data) {
     for (const item of data.byRep) {
@@ -33,7 +34,8 @@ export default function AnalyticsPage() {
 
   return (
     <AdminShell>
-      <div className="p-8">
+      <div className="p-8 max-w-5xl mx-auto">
+
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Analytics</h1>
@@ -56,31 +58,34 @@ export default function AnalyticsPage() {
           <div className="text-slate-400 text-sm">Loading analytics...</div>
         ) : data ? (
           <>
-            {/* Summary */}
+            {/* Summary cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <StatCard label="Taps" value={data.summary.taps} sub={`last ${days} days`} />
-              <StatCard label="Page Views" value={data.summary.views} sub={`last ${days} days`} />
-              <StatCard label="Form Submits" value={data.summary.submits} sub={`last ${days} days`} />
-              <StatCard label="Conversion" value={`${data.summary.conversionRate}%`} sub="tap → submit" highlight />
+              <StatCard label="Taps"        value={data.summary.taps}                  sub={`last ${days}d`} />
+              <StatCard label="Page Views"  value={data.summary.views}                 sub={`last ${days}d`} />
+              <StatCard label="Submits"     value={data.summary.submits}               sub={`last ${days}d`} />
+              <StatCard label="Conversion"  value={`${data.summary.conversionRate}%`}  sub="tap → submit" highlight />
             </div>
 
             {/* Daily chart */}
             <div className="card mb-6">
               <h2 className="font-semibold text-white mb-4">Daily Taps</h2>
               {data.dailyChart.length === 0 ? (
-                <p className="text-slate-500 text-sm">No taps yet in this window.</p>
+                <p className="text-slate-500 text-sm">No taps recorded in this window.</p>
               ) : (
-                <div>
+                <>
                   <div className="flex items-end gap-0.5 h-32 mb-2">
                     {data.dailyChart.map((d) => {
                       const max = Math.max(...data.dailyChart.map((x) => x.count), 1);
                       const pct = (d.count / max) * 100;
                       return (
-                        <div key={d.date} title={`${d.date}: ${d.count} taps`} className="group relative flex-1 flex flex-col items-center">
+                        <div key={d.date} title={`${d.date}: ${d.count}`} className="flex-1 relative group">
                           <div
-                            className="w-full rounded-t bg-orange-500/70 hover:bg-orange-500 cursor-pointer transition-colors"
+                            className="w-full rounded-t bg-orange-500/70 hover:bg-orange-500 cursor-default transition-colors"
                             style={{ height: `${pct}%`, minHeight: d.count > 0 ? "3px" : "0" }}
                           />
+                          <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 border border-slate-700 text-xs text-white px-2 py-1 rounded whitespace-nowrap z-10">
+                            {d.date}: {d.count}
+                          </div>
                         </div>
                       );
                     })}
@@ -89,7 +94,7 @@ export default function AnalyticsPage() {
                     <span>{data.dailyChart[0]?.date}</span>
                     <span>{data.dailyChart[data.dailyChart.length - 1]?.date}</span>
                   </div>
-                </div>
+                </>
               )}
             </div>
 
@@ -100,8 +105,8 @@ export default function AnalyticsPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-slate-400 text-left">
-                        <th className="pb-3 pr-6">Rep ID</th>
+                      <tr className="text-slate-400 text-left border-b border-slate-800">
+                        <th className="pb-3 pr-6">Rep</th>
                         <th className="pb-3 pr-6">Taps</th>
                         <th className="pb-3 pr-6">Views</th>
                         <th className="pb-3 pr-6">Submits</th>
@@ -110,14 +115,14 @@ export default function AnalyticsPage() {
                     </thead>
                     <tbody className="divide-y divide-slate-800">
                       {repIds.map((repId) => {
-                        const r = repMap[repId];
-                        const taps = r["TAP"] ?? 0;
-                        const views = r["VIEW"] ?? 0;
+                        const r       = repMap[repId];
+                        const taps    = r["TAP"]    ?? 0;
+                        const views   = r["VIEW"]   ?? 0;
                         const submits = r["SUBMIT"] ?? 0;
-                        const conv = taps > 0 ? ((submits / taps) * 100).toFixed(1) : "0";
+                        const conv    = taps > 0 ? ((submits / taps) * 100).toFixed(1) : "0";
                         return (
                           <tr key={repId} className="text-white">
-                            <td className="py-3 pr-6 font-mono text-orange-400">Rep #{repId}</td>
+                            <td className="py-3 pr-6 text-orange-400 font-mono">Rep #{repId}</td>
                             <td className="py-3 pr-6">{taps}</td>
                             <td className="py-3 pr-6">{views}</td>
                             <td className="py-3 pr-6">{submits}</td>
@@ -131,7 +136,9 @@ export default function AnalyticsPage() {
               </div>
             )}
           </>
-        ) : null}
+        ) : (
+          <p className="text-slate-500 text-sm">No data available.</p>
+        )}
       </div>
     </AdminShell>
   );
