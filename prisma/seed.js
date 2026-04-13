@@ -1,12 +1,12 @@
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
+const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("Seeding database...");
 
-  const password = process.env.ADMIN_PASSWORD ?? "changeme123!";
+  const password = process.env.ADMIN_PASSWORD || "changeme123!";
   if (!process.env.ADMIN_PASSWORD) {
     console.warn(
       "ADMIN_PASSWORD is not set. Using the default password. Set ADMIN_PASSWORD in Railway before deploying."
