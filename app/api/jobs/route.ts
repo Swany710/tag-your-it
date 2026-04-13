@@ -3,7 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// GET /api/jobs — list all jobs
+export const dynamic = "force-dynamic";
+
+// GET /api/jobs - list all jobs
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -17,7 +19,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ jobs });
 }
 
-// POST /api/jobs — create a job completion record
+// POST /api/jobs - create a job completion record
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

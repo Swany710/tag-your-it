@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/reps/[id]
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -21,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   return NextResponse.json({ rep });
 }
 
-// PATCH /api/reps/[id] — update rep
+// PATCH /api/reps/[id] - update rep
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -43,7 +45,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   return NextResponse.json({ rep });
 }
 
-// DELETE /api/reps/[id] — soft delete (deactivate)
+// DELETE /api/reps/[id] - soft delete (deactivate)
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

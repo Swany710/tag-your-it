@@ -5,7 +5,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { EventType } from "@prisma/client";
 
-// POST /api/events — public event tracking
+export const dynamic = "force-dynamic";
+
+// POST /api/events - public event tracking
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body || typeof body.repId !== "number" || typeof body.type !== "string") {
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-// GET /api/events — admin analytics
+// GET /api/events - admin analytics
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -43,7 +45,6 @@ export async function GET(req: NextRequest) {
   };
   if (repId) where.repId = Number(repId);
 
-  // Summary stats
   const [taps, views, submits, byRep] = await Promise.all([
     prisma.event.count({ where: { ...where, type: "TAP" } }),
     prisma.event.count({ where: { ...where, type: "VIEW" } }),
@@ -55,14 +56,12 @@ export async function GET(req: NextRequest) {
     }),
   ]);
 
-  // Daily tap chart data
   const rawEvents = await prisma.event.findMany({
     where: { ...where, type: "TAP" },
     select: { createdAt: true, repId: true },
     orderBy: { createdAt: "asc" },
   });
 
-  // Group by day
   const byDay: Record<string, number> = {};
   for (const e of rawEvents) {
     const day = e.createdAt.toISOString().split("T")[0];

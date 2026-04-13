@@ -5,7 +5,9 @@ import { sendLeadNotification } from "@/lib/email";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// POST /api/leads — public lead capture (from rep landing page)
+export const dynamic = "force-dynamic";
+
+// POST /api/leads - public lead capture (from rep landing page)
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
@@ -57,7 +59,6 @@ export async function POST(req: NextRequest) {
 
   await logEvent({ repId, type: "SUBMIT", meta: { leadId: lead.id }, userAgent, ip });
 
-  // Fire email notification (non-blocking)
   sendLeadNotification({
     repName: rep.name,
     repEmail: rep.email,
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true, leadId: lead.id });
 }
 
-// GET /api/leads — admin only, list all leads
+// GET /api/leads - admin only, list all leads
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

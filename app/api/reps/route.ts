@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/reps - admin: list all reps
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
