@@ -23,35 +23,75 @@ interface RepStat {
   stats: { taps: number; leads: number; conversionRate: string };
 }
 
+async function getJson<T>(url: string): Promise<T> {
+  const response = await fetch(url, { cache: "no-store" });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const message = typeof (data as { error?: unknown }).error === "string" ? (data as { error: string }).error : `Request failed: ${response.status}`;
+    throw new Error(message);
+  }
+
+  return data as T;
+}
+
 export default function AdminDashboard() {
-  const [stats, setStats]           = useState<Stats | null>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
-  const [reps, setReps]             = useState<RepStat[]>([]);
+  const [reps, setReps] = useState<RepStat[]>([]);
   const [totalLeads, setTotalLeads] = useState(0);
-  const [loading, setLoading]       = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/events?days=30").then((r) => r.json()),
-      fetch("/api/leads?limit=5").then((r) => r.json()),
-      fetch("/api/reps?stats=true").then((r) => r.json()),
-    ]).then(([evData, leadData, repData]) => {
-      setStats(evData);
-      setRecentLeads(leadData.leads ?? []);
-      setTotalLeads(leadData.total ?? 0);
-      // Only show active reps with at least 1 tap on the leaderboard
-      const activeReps = (repData.reps ?? []).filter(
-        (r: RepStat) => r.isActive && r.stats.taps > 0
-      );
-      setReps(activeReps);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    let cancelled = false;
+
+    async function load() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const [evData, leadData, repData] = await Promise.all([
+          getJson<Stats>("/api/events?days=30"),
+          getJson<{ leads?: Lead[]; total?: number }>("/api/leads?limit=5"),
+          getJson<{ reps?: RepStat[] }>("/api/reps?stats=true"),
+        ]);
+
+        if (cancelled) return;
+
+        setStats(evData);
+        setRecentLeads(Array.isArray(leadData.leads) ? leadData.leads : []);
+        setTotalLeads(typeof leadData.total === "number" ? leadData.total : 0);
+
+        const activeReps = (Array.isArray(repData.reps) ? repData.reps : []).filter(
+          (rep) => rep.isActive && rep.stats && rep.stats.taps > 0
+        );
+        setReps(activeReps);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load admin dashboard.");
+          setStats(null);
+          setRecentLeads([]);
+          setReps([]);
+          setTotalLeads(0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const summary = stats?.summary;
+  const dailyChart = Array.isArray(stats?.dailyChart) ? stats!.dailyChart : [];
 
   return (
     <AdminShell>
       <div className="p-8 max-w-7xl mx-auto">
-
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="text-slate-400 text-sm mt-1">Last 30 days</p>
@@ -59,19 +99,24 @@ export default function AdminDashboard() {
 
         {loading ? (
           <div className="text-slate-400 text-sm">Loading stats...</div>
+        ) : error ? (
+          <div className="card">
+            <p className="text-red-300 font-medium mb-2">Admin data could not be loaded.</p>
+            <p className="text-slate-400 text-sm mb-4">{error}</p>
+            <Link href="/admin/login" className="btn-primary inline-block">
+              Return to login
+            </Link>
+          </div>
         ) : (
           <>
-            {/* KPI cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <KpiCard label="Total Taps"      value={stats?.summary.taps ?? 0}         color="orange" />
-              <KpiCard label="Total Leads"     value={totalLeads}                        color="blue"   />
-              <KpiCard label="Form Submits"    value={stats?.summary.submits ?? 0}       color="green"  />
-              <KpiCard label="Conversion Rate" value={`${stats?.summary.conversionRate ?? 0}%`} color="purple" />
+              <KpiCard label="Total Taps" value={summary?.taps ?? 0} color="orange" />
+              <KpiCard label="Total Leads" value={totalLeads} color="blue" />
+              <KpiCard label="Form Submits" value={summary?.submits ?? 0} color="green" />
+              <KpiCard label="Conversion Rate" value={`${summary?.conversionRate ?? 0}%`} color="purple" />
             </div>
 
-            {/* Rep leaderboard + recent leads */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-
               <div className="card">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold text-white">Rep Leaderboard</h2>
@@ -93,8 +138,7 @@ export default function AdminDashboard() {
                   ))}
                   {reps.length === 0 && (
                     <p className="text-slate-500 text-sm">
-                      No taps yet.{" "}
-                      <Link href="/admin/reps" className="text-orange-400 hover:underline">Configure your reps →</Link>
+                      No taps yet. <Link href="/admin/reps" className="text-orange-400 hover:underline">Configure your reps →</Link>
                     </p>
                   )}
                 </div>
@@ -113,7 +157,7 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-sm font-medium truncate">{lead.name}</p>
-                        <p className="text-slate-500 text-xs">via {lead.rep.name} · {new Date(lead.createdAt).toLocaleDateString()}</p>
+                        <p className="text-slate-500 text-xs">via {lead.rep?.name ?? "Unknown rep"} · {new Date(lead.createdAt).toLocaleDateString()}</p>
                       </div>
                       <StatusBadge status={lead.status} />
                     </div>
@@ -125,13 +169,12 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Daily tap chart */}
-            {stats && stats.dailyChart.length > 0 && (
+            {dailyChart.length > 0 && (
               <div className="card mb-6">
                 <h2 className="font-semibold text-white mb-4">Daily Taps (30 days)</h2>
                 <div className="flex items-end gap-1 h-24">
-                  {stats.dailyChart.slice(-30).map((d) => {
-                    const max = Math.max(...stats.dailyChart.map((x) => x.count), 1);
+                  {dailyChart.slice(-30).map((d) => {
+                    const max = Math.max(...dailyChart.map((x) => x.count), 1);
                     const pct = (d.count / max) * 100;
                     return (
                       <div key={d.date} className="flex-1 relative group">
@@ -149,7 +192,6 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* Quick actions */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Link href="/admin/reps/new" className="card hover:border-orange-500/50 transition-colors text-center py-5 cursor-pointer">
                 <div className="text-2xl mb-2">➕</div>
@@ -178,8 +220,8 @@ export default function AdminDashboard() {
 function KpiCard({ label, value, color }: { label: string; value: string | number; color: string }) {
   const colors: Record<string, string> = {
     orange: "text-orange-400",
-    blue:   "text-blue-400",
-    green:  "text-green-400",
+    blue: "text-blue-400",
+    green: "text-green-400",
     purple: "text-purple-400",
   };
   return (
@@ -192,11 +234,11 @@ function KpiCard({ label, value, color }: { label: string; value: string | numbe
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    NEW:               "badge-new",
-    CONTACTED:         "badge-contacted",
+    NEW: "badge-new",
+    CONTACTED: "badge-contacted",
     INSPECTION_BOOKED: "badge-booked",
-    WON:               "badge-won",
-    LOST:              "badge-lost",
+    WON: "badge-won",
+    LOST: "badge-lost",
   };
   return <span className={`badge ${map[status] ?? "badge-new"}`}>{status.replace(/_/g, " ")}</span>;
 }
