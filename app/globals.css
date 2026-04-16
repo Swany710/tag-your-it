@@ -56,3 +56,78 @@ body {
 .badge-booked   { @apply bg-purple-900 text-purple-300; }
 .badge-won      { @apply bg-green-900 text-green-300; }
 .badge-lost     { @apply bg-red-900 text-red-300; }
+
+/* AMRG tap card landing page */
+.amrg-page {
+  --bg: #0a0a0c;
+  --panel: #111216;
+  --panel-2: #17191f;
+  --text: #f3f5f7;
+  --muted: #b7bcc7;
+  --accent: #f5a300;
+  --accent-2: #ffbf3c;
+  --line: rgba(255,255,255,0.08);
+  --shadow: 0 20px 60px rgba(0,0,0,0.45);
+  --radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(245,163,0,0.14), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(255,191,60,0.08), transparent 22%),
+    linear-gradient(180deg, #090909 0%, #0f1014 100%);
+  color: var(--text);
+}
+
+.amrg-page a { color: inherit; text-decoration: none; }
+.amrg-page .container { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
+.amrg-page .topbar { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); background: rgba(9,9,11,.72); border-bottom: 1px solid rgba(255,255,255,.06); }
+.amrg-page .nav { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.amrg-page .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; letter-spacing: .06em; }
+.amrg-page .brand-mark { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(145deg, rgba(245,163,0,.22), rgba(245,163,0,.06)); border: 1px solid rgba(245,163,0,.4); display: grid; place-items: center; color: var(--accent); box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); font-size: 1.15rem; }
+.amrg-page .brand-copy small { display: block; color: var(--accent); font-size: .72rem; letter-spacing: .18em; margin-bottom: 3px; }
+.amrg-page .brand-copy span { display: block; font-size: 1rem; }
+.amrg-page .nav-cta { padding: 12px 18px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #151515; font-weight: 800; box-shadow: 0 10px 30px rgba(245,163,0,.24); }
+.amrg-page .hero { padding: 56px 0 48px; }
+.amrg-page .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 42px; align-items: center; }
+.amrg-page .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; background: rgba(245,163,0,.08); border: 1px solid rgba(245,163,0,.22); color: var(--accent-2); font-size: .82rem; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 18px; }
+.amrg-page h1 { margin: 0 0 18px; font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: .97; letter-spacing: -.04em; }
+.amrg-page .accent { color: var(--accent); }
+.amrg-page .hero p { margin: 0; color: var(--muted); font-size: 1.06rem; line-height: 1.75; max-width: 620px; }
+.amrg-page .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+.amrg-page .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 22px; border-radius: 16px; font-weight: 800; transition: .2s ease; }
+.amrg-page .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #141414; box-shadow: 0 16px 34px rgba(245,163,0,.22); }
+.amrg-page .btn-secondary { border: 1px solid rgba(255,255,255,.09); background: rgba(255,255,255,.03); color: var(--text); }
+.amrg-page .btn:hover { transform: translateY(-2px); }
+.amrg-page .contact-strip { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 18px; color: var(--muted); font-size: .95rem; }
+.amrg-page .contact-strip span { display: inline-flex; align-items: center; gap: 8px; }
+.amrg-page .micro-note { margin-top: 14px; color: var(--accent-2); font-size: .92rem; font-weight: 600; }
+.amrg-page .mockup-wrap { position: relative; padding: 24px; display: flex; justify-content: center; }
+.amrg-page .card-glow { position: absolute; inset: 12% 14%; background: radial-gradient(circle, rgba(245,163,0,.2), transparent 62%); filter: blur(28px); z-index: 0; }
+.amrg-page .tap-card { position: relative; z-index: 1; width: min(100%,510px); aspect-ratio: 1.72/1; border-radius: 24px; overflow: hidden; background: radial-gradient(circle at 30% 55%, rgba(255,255,255,.08), transparent 22%), linear-gradient(145deg,#222329 0%, #0d0e12 52%, #14151a 100%); border: 1px solid rgba(255,255,255,.08); box-shadow: var(--shadow); padding: 24px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px; isolation: isolate; }
+.amrg-page .tap-card::before { content: ""; position: absolute; left: -5%; right: -5%; bottom: 12px; height: 6px; background: linear-gradient(90deg, transparent 0%, var(--accent) 22%, var(--accent-2) 50%, var(--accent) 78%, transparent 100%); opacity: .95; }
+.amrg-page .tap-card::after { content: ""; position: absolute; left: 0; bottom: 22px; width: 46%; height: 56px; background: linear-gradient(145deg, transparent 0 14%, var(--accent) 14% 16%, #d6dbe0 16% 27%, #eff2f5 27% 36%, transparent 36%); opacity: .95; clip-path: polygon(0 100%, 0 62%, 58% 62%, 66% 28%, 100% 28%, 100% 100%); }
+.amrg-page .info h2 { margin: 0; font-size: clamp(1.7rem, 3vw, 2.25rem); line-height: 1; }
+.amrg-page .role { margin-top: 10px; color: var(--accent-2); font-weight: 700; font-size: .96rem; }
+.amrg-page .details { margin-top: 24px; display: grid; gap: 11px; color: #edf1f5; font-size: .92rem; }
+.amrg-page .details div { display: flex; align-items: flex-start; gap: 10px; line-height: 1.45; position: relative; }
+.amrg-page .details div:last-child span { position: relative; z-index: 1; }
+.amrg-page .details div:last-child span::before { content: ""; position: absolute; left: -6px; right: -6px; bottom: 4px; height: 6px; background: linear-gradient(90deg, transparent 0%, var(--accent) 25%, var(--accent-2) 50%, var(--accent) 75%, transparent 100%); z-index: -1; opacity: .9; }
+.amrg-page .dot { width: 24px; height: 24px; min-width: 24px; border-radius: 999px; background: rgba(245,163,0,.14); border: 1px solid rgba(245,163,0,.32); color: var(--accent); display: grid; place-items: center; font-size: .76rem; margin-top: 1px; }
+.amrg-page .logo-side { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-left: 8px; }
+.amrg-page .logo-img { width: 140px; height: auto; margin-bottom: 12px; filter: drop-shadow(0 10px 25px rgba(245,163,0,.25)); }
+.amrg-page .tagline { color: var(--accent-2); font-weight: 700; font-size: .95rem; }
+.amrg-page .cta-block { margin: 40px 0 60px; background: radial-gradient(circle at top right, rgba(245,163,0,.18), transparent 28%), linear-gradient(135deg, #15171b 0%, #0d0f13 100%); border: 1px solid rgba(245,163,0,.16); border-radius: 32px; padding: 34px; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; }
+.amrg-page .cta-block h3 { margin: 0 0 8px; font-size: clamp(1.7rem, 3vw, 2.6rem); }
+.amrg-page .cta-block p { margin: 0; color: var(--muted); line-height: 1.7; max-width: 680px; }
+.amrg-page footer { padding: 0 0 42px; color: #8d94a0; font-size: .92rem; }
+
+@media (max-width: 980px) {
+  .amrg-page .hero-grid { grid-template-columns: 1fr; }
+  .amrg-page .tap-card { max-width: 560px; }
+}
+
+@media (max-width: 720px) {
+  .amrg-page .hero { padding-top: 34px; }
+  .amrg-page .tap-card { grid-template-columns: 1fr; aspect-ratio: auto; padding-bottom: 86px; }
+  .amrg-page .logo-side { padding-left: 0; margin-top: 8px; }
+  .amrg-page .contact-strip { flex-direction: column; gap: 10px; }
+  .amrg-page .cta-block { padding: 26px; }
+}
