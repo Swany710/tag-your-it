@@ -7,17 +7,11 @@ export default function HomePage() {
             <div className="brand-mark">
               <img src="/logo.svg" alt="AMRG Logo" style={{ width: 28, height: "auto" }} />
             </div>
-            <div className="brand-mark">⚜</div>
             <div className="brand-copy">
               <small>AMRG EXTERIORS</small>
               <span>Tap Card Landing Page</span>
             </div>
           </a>
-
-          <a className="nav-cta" href="tel:6125137534">Call Now</a>
-        </div>
-      </header>
-
           <a className="nav-cta" href="tel:6125137534">Call Now</a>
         </div>
       </header>
@@ -28,10 +22,10 @@ export default function HomePage() {
             <div>
               <div className="eyebrow">Good meeting you</div>
               <h1>
-                Good meeting you — <span className="accent">don’t wait too long to take a look</span>.
+                Good meeting you — <span className="accent">don&apos;t wait too long to take a look</span>.
               </h1>
               <p>
-                Storm damage isn’t always obvious right away. It’s worth taking a look sooner rather than later — this makes it easy to get started.
+                Storm damage isn&apos;t always obvious right away. It&apos;s worth taking a look sooner rather than later — this makes it easy to get started.
               </p>
 
               <div className="hero-actions">
@@ -41,12 +35,7 @@ export default function HomePage() {
                 <a className="btn btn-primary" href="https://www.mcgeerestoration.com" target="_blank" rel="noopener">Start My Inspection</a>
               </div>
 
-              <div className="micro-note">Fastest next step: send a quick text and I’ll take it from there.</div>
-
-                <a className="btn btn-primary" href="https://www.mcgeerestoration.com/free-inspection" target="_blank" rel="noopener">Start My Inspection</a>
-              </div>
-
-              <div className="micro-note">Fastest next step: send a quick text and I’ll take it from there.</div>
+              <div className="micro-note">Fastest next step: send a quick text and I&apos;ll take it from there.</div>
 
               <div className="contact-strip">
                 <span>📱 (612) 513-7534</span>
@@ -84,7 +73,7 @@ export default function HomePage() {
             <div>
               <h3>The sooner we check it, the better.</h3>
               <p>
-                We’ll take a look, document anything we find, and walk you through your options — including insurance if it applies.
+                We&apos;ll take a look, document anything we find, and walk you through your options — including insurance if it applies.
               </p>
             </div>
 
