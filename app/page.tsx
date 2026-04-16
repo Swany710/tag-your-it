@@ -1,117 +1,93 @@
-import Link from "next/link";
-
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      {/* Nav */}
-      <nav className="border-b border-slate-800 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center">
-            <span className="text-white text-lg">📡</span>
-          </div>
-          <span className="text-white font-bold text-lg">Tap System</span>
-        </div>
-        <Link href="/admin" className="btn-primary text-sm py-2 px-4">Admin Dashboard →</Link>
-      </nav>
-
-      {/* Hero */}
-      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 rounded-full px-4 py-1.5 text-orange-400 text-sm font-medium mb-6">
-          <span>🏠</span> Built for contractors
-        </div>
-        <h1 className="text-5xl md:text-6xl font-black text-white leading-tight mb-6">
-          Turn every door knock<br />
-          <span className="text-orange-400">into a data point.</span>
-        </h1>
-        <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-8">
-          Tap-to-lead cards for your reps. Smart completion plaques for every roof.
-          Full analytics on every interaction.
-        </p>
-        <div className="flex gap-4 justify-center flex-wrap">
-          <Link href="/admin" className="btn-primary text-base py-3 px-6">Get Started →</Link>
-          <a href="#how" className="btn-secondary text-base py-3 px-6">See How It Works</a>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="max-w-4xl mx-auto px-6 pb-16">
-        <div className="grid grid-cols-3 gap-4">
-          {[
-            { value: "< 1s", label: "Tap response time" },
-            { value: "∞", label: "Rewrite capability" },
-            { value: "20+ yrs", label: "Tag lifespan" },
-          ].map((s) => (
-            <div key={s.label} className="card text-center">
-              <p className="text-3xl font-black text-orange-400 mb-1">{s.value}</p>
-              <p className="text-slate-400 text-sm">{s.label}</p>
+    <div className="amrg-page">
+      <header className="topbar">
+        <div className="container nav">
+          <a href="#top" className="brand">
+            <div className="brand-mark">⚜</div>
+            <div className="brand-copy">
+              <small>AMRG EXTERIORS</small>
+              <span>Tap Card Landing Page</span>
             </div>
-          ))}
+          </a>
+          <a className="nav-cta" href="tel:6125137534">Call Now</a>
         </div>
-      </section>
+      </header>
 
-      {/* How it works */}
-      <section id="how" className="max-w-5xl mx-auto px-6 pb-20">
-        <h2 className="text-3xl font-bold text-white text-center mb-12">Three use cases. One system.</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            {
-              icon: "🤝",
-              title: "Rep Cards",
-              desc: "Tap your 3D-printed house card → homeowner sees your profile, saves contact, books inspection. Every tap tracked to the rep.",
-              color: "orange",
-            },
-            {
-              icon: "🎪",
-              title: "Trade Shows",
-              desc: "Tap to enter, tap to book, tap to capture. Each rep gets a unique ID. Your booth becomes a lead machine.",
-              color: "blue",
-            },
-            {
-              icon: "🏠",
-              title: "Job Completions",
-              desc: "Permanent NFC disc in every install. Homeowner taps years later to access warranty info, maintenance reminders, referral rewards.",
-              color: "green",
-            },
-          ].map((item) => (
-            <div key={item.title} className="card">
-              <div className="text-4xl mb-4">{item.icon}</div>
-              <h3 className="text-white font-bold text-lg mb-2">{item.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <main id="top">
+        <section className="hero">
+          <div className="container hero-grid">
+            <div>
+              <div className="eyebrow">Good meeting you</div>
+              <h1>
+                Good meeting you — <span className="accent">don’t wait too long to take a look</span>.
+              </h1>
+              <p>
+                Storm damage isn’t always obvious right away. It’s worth taking a look sooner rather than later — this makes it easy to get started.
+              </p>
 
-      {/* Hardware */}
-      <section className="bg-slate-900 border-y border-slate-800 py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-10">The hardware we use</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="card border-orange-500/30">
-              <h3 className="text-white font-bold mb-2">38mm NTAG216 Wet Inlay</h3>
-              <p className="text-slate-400 text-sm">Embedded in 3D printed rep cards. 888 bytes, NXP chip, instant tap. Perfect under 0.8mm PLA.</p>
-              <div className="mt-3 text-orange-400 text-sm font-medium">Rep cards · 3D house models</div>
+              <div className="hero-actions">
+                <a className="btn btn-primary" href="tel:6125137534">Call Eric</a>
+                <a className="btn btn-secondary" href="sms:6125137534?body=Hi%20Eric%2C%20this%20is%20%5Byour%20name%5D.%20I%20wanted%20to%20follow%20up%20about%20my%20home.">Text Eric</a>
+                <a className="btn btn-secondary" href="/eric-swanberg.vcf" download>Save Contact</a>
+                <a className="btn btn-primary" href="https://www.mcgeerestoration.com/free-inspection" target="_blank" rel="noopener">Start My Inspection</a>
+              </div>
+
+              <div className="micro-note">Fastest next step: send a quick text and I’ll take it from there.</div>
+
+              <div className="contact-strip">
+                <span>📱 (612) 513-7534</span>
+                <span>☎ (952) 426-3736</span>
+                <span>📍 Minnetonka, MN</span>
+              </div>
             </div>
-            <div className="card border-green-500/30">
-              <h3 className="text-white font-bold mb-2">NTAG216 Industrial Epoxy Disc</h3>
-              <p className="text-slate-400 text-sm">Waterproof, impact-resistant, made to last decades. Installed at job completion. Permanent digital footprint for every roof.</p>
-              <div className="mt-3 text-green-400 text-sm font-medium">Job plaques · Permanent installs</div>
+
+            <div className="mockup-wrap">
+              <div className="card-glow"></div>
+              <div className="tap-card">
+                <div className="info">
+                  <h2>Eric Swanberg</h2>
+                  <div className="role">Exterior Renovation Consultant</div>
+                  <div className="details">
+                    <div><span className="dot">☎</span><span>M: (612) 513-7534<br />O: (952) 426-3736</span></div>
+                    <div><span className="dot">✉</span><span>ericswanberg@mcgeerestoration.com</span></div>
+                    <div><span className="dot">🌐</span><span>www.mcgeerestoration.com</span></div>
+                    <div><span className="dot">📍</span><span>10201 Wayzata Blvd #130<br />Minnetonka, MN 55305</span></div>
+                  </div>
+                </div>
+
+                <div className="logo-side">
+                  <img src="/logo.svg" alt="AMRG Exteriors Logo" className="logo-img" />
+                  <div className="tagline">Roofing | Siding | Windows</div>
+                </div>
+              </div>
             </div>
           </div>
+        </section>
+
+        <section className="container">
+          <div className="cta-block" id="contact">
+            <div>
+              <h3>The sooner we check it, the better.</h3>
+              <p>
+                We’ll take a look, document anything we find, and walk you through your options — including insurance if it applies.
+              </p>
+            </div>
+
+            <div className="hero-actions">
+              <a className="btn btn-primary" href="tel:6125137534">Call Eric</a>
+              <a className="btn btn-secondary" href="sms:6125137534?body=Hi%20Eric%2C%20this%20is%20%5Byour%20name%5D.%20I%20wanted%20to%20follow%20up%20about%20my%20home.">Text Eric</a>
+              <a className="btn btn-secondary" href="/eric-swanberg.vcf" download>Save Contact</a>
+              <a className="btn btn-secondary" href="https://www.mcgeerestoration.com" target="_blank" rel="noopener">Visit Website</a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div className="container">
+          AMRG Exteriors • Eric Swanberg • Exterior Renovation Consultant
         </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 px-6 text-center">
-        <h2 className="text-4xl font-black text-white mb-4">Ready to tap smarter?</h2>
-        <p className="text-slate-400 mb-8 max-w-lg mx-auto">Build your first serialized rep tag in under 10 minutes. No tech experience required.</p>
-        <Link href="/admin" className="btn-primary text-lg py-4 px-8 inline-block">
-          Open Dashboard →
-        </Link>
-      </section>
-
-      <footer className="border-t border-slate-800 text-center text-slate-600 text-sm py-8">
-        Tap System · Built by Swany
       </footer>
     </div>
   );

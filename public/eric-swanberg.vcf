@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Eric Swanberg
+N:Swanberg;Eric;;;
+ORG:AMRG Exteriors
+TITLE:Exterior Renovation Consultant
+TEL;TYPE=CELL:(612) 513-7534
+TEL;TYPE=WORK:(952) 426-3736
+EMAIL:ericswanberg@mcgeerestoration.com
+URL:https://www.mcgeerestoration.com
+ADR;TYPE=WORK:;;10201 Wayzata Blvd #130;Minnetonka;MN;55305;USA
+END:VCARD
