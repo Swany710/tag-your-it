@@ -4,12 +4,20 @@ export default function HomePage() {
       <header className="topbar">
         <div className="container nav">
           <a href="#top" className="brand">
+            <div className="brand-mark">
+              <img src="/logo.svg" alt="AMRG Logo" style={{ width: 28, height: "auto" }} />
+            </div>
             <div className="brand-mark">⚜</div>
             <div className="brand-copy">
               <small>AMRG EXTERIORS</small>
               <span>Tap Card Landing Page</span>
             </div>
           </a>
+
+          <a className="nav-cta" href="tel:6125137534">Call Now</a>
+        </div>
+      </header>
+
           <a className="nav-cta" href="tel:6125137534">Call Now</a>
         </div>
       </header>
@@ -30,6 +38,11 @@ export default function HomePage() {
                 <a className="btn btn-primary" href="tel:6125137534">Call Eric</a>
                 <a className="btn btn-secondary" href="sms:6125137534?body=Hi%20Eric%2C%20this%20is%20%5Byour%20name%5D.%20I%20wanted%20to%20follow%20up%20about%20my%20home.">Text Eric</a>
                 <a className="btn btn-secondary" href="/eric-swanberg.vcf" download>Save Contact</a>
+                <a className="btn btn-primary" href="https://www.mcgeerestoration.com" target="_blank" rel="noopener">Start My Inspection</a>
+              </div>
+
+              <div className="micro-note">Fastest next step: send a quick text and I’ll take it from there.</div>
+
                 <a className="btn btn-primary" href="https://www.mcgeerestoration.com/free-inspection" target="_blank" rel="noopener">Start My Inspection</a>
               </div>
 
@@ -48,6 +61,7 @@ export default function HomePage() {
                 <div className="info">
                   <h2>Eric Swanberg</h2>
                   <div className="role">Exterior Renovation Consultant</div>
+
                   <div className="details">
                     <div><span className="dot">☎</span><span>M: (612) 513-7534<br />O: (952) 426-3736</span></div>
                     <div><span className="dot">✉</span><span>ericswanberg@mcgeerestoration.com</span></div>
