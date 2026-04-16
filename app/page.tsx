@@ -7,11 +7,16 @@ export default function HomePage() {
             <div className="brand-mark">
               <img src="/logo.svg" alt="AMRG Logo" style={{ width: 28, height: "auto" }} />
             </div>
+            <div className="brand-mark">⚜</div>
             <div className="brand-copy">
               <small>AMRG EXTERIORS</small>
               <span>Tap Card Landing Page</span>
             </div>
           </a>
+
+          <a className="nav-cta" href="tel:6125137534">Call Now</a>
+        </div>
+      </header>
 
           <a className="nav-cta" href="tel:6125137534">Call Now</a>
         </div>
@@ -34,6 +39,11 @@ export default function HomePage() {
                 <a className="btn btn-secondary" href="sms:6125137534?body=Hi%20Eric%2C%20this%20is%20%5Byour%20name%5D.%20I%20wanted%20to%20follow%20up%20about%20my%20home.">Text Eric</a>
                 <a className="btn btn-secondary" href="/eric-swanberg.vcf" download>Save Contact</a>
                 <a className="btn btn-primary" href="https://www.mcgeerestoration.com" target="_blank" rel="noopener">Start My Inspection</a>
+              </div>
+
+              <div className="micro-note">Fastest next step: send a quick text and I’ll take it from there.</div>
+
+                <a className="btn btn-primary" href="https://www.mcgeerestoration.com/free-inspection" target="_blank" rel="noopener">Start My Inspection</a>
               </div>
 
               <div className="micro-note">Fastest next step: send a quick text and I’ll take it from there.</div>
