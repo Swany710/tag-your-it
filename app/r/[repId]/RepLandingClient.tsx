@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { RepLandingTemplateData } from "@/lib/repLandingTemplate";
 
 interface Rep {
   id: number;
@@ -139,8 +140,6 @@ const css = `
     line-height: 0.97;
     letter-spacing: -0.04em;
   }
-
-  .rli-accent { color: var(--accent); }
 
   .rli-hero-p {
     margin: 0;
@@ -281,6 +280,11 @@ const css = `
     line-height: 1.45;
   }
 
+  .rli-card-details a {
+    color: inherit;
+    word-break: break-word;
+  }
+
   .rli-dot {
     width: 24px; height: 24px; min-width: 24px;
     border-radius: 999px;
@@ -380,15 +384,40 @@ const css = `
   }
 `;
 
-export default function RepLandingClient({ rep }: { rep: Rep }) {
+function fillTemplate(value: string, replacements: Record<string, string>) {
+  return value.replace(/{{\s*(firstName|repName|companyName)\s*}}/g, (_, key: string) => {
+    return replacements[key] ?? "";
+  });
+}
+
+export default function RepLandingClient({
+  rep,
+  template,
+}: {
+  rep: Rep;
+  template: RepLandingTemplateData;
+}) {
   const [step, setStep] = useState<Step>("profile");
   const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const businessName = rep.company?.trim() || "AMRG Exteriors";
+  const businessName = rep.company?.trim() || template.companyName;
   const roleLabel = rep.title?.trim() || "Exterior Renovation Consultant";
   const firstName = rep.name.split(" ")[0];
+  const websiteUrl = template.websiteUrl;
+  const websiteLabel = template.websiteLabel || websiteUrl;
+  const logoSrc = template.logoUrl || "/logo.png";
+  const formBody = fillTemplate(template.formBody, {
+    firstName,
+    repName: rep.name,
+    companyName: businessName,
+  });
+  const successBody = fillTemplate(template.successBody, {
+    firstName,
+    repName: rep.name,
+    companyName: businessName,
+  });
 
   useEffect(() => {
     fetch("/api/events", {
@@ -447,7 +476,7 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
       `TITLE:${roleLabel}`,
       rep.phone ? `TEL;TYPE=CELL:${rep.phone}` : "",
       rep.email ? `EMAIL:${rep.email}` : "",
-      "URL:https://www.mcgeerestoration.com",
+      websiteUrl ? `URL:${websiteUrl}` : "",
       "END:VCARD",
     ]
       .filter(Boolean)
@@ -479,16 +508,14 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
           <a href="#top" className="rli-brand">
             <div className="rli-brand-mark">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt={`${businessName} logo`} style={{ width: "28px", height: "auto" }} />
+              <img src={logoSrc} alt={`${businessName} logo`} style={{ width: "28px", height: "auto" }} />
             </div>
             <div className="rli-brand-copy">
               <small>{businessName.toUpperCase()}</small>
               <span>Tap Card</span>
             </div>
           </a>
-          {rep.phone && (
-            <a className="rli-nav-cta" href={`tel:${rep.phone}`}>Call Now</a>
-          )}
+          {rep.phone && <a className="rli-nav-cta" href={`tel:${rep.phone}`}>Call Now</a>}
         </div>
       </header>
 
@@ -496,14 +523,9 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
         <section className="rli-hero">
           <div className="rli-container rli-hero-grid">
             <div>
-              <div className="rli-eyebrow">Good meeting you</div>
-              <h1 className="rli-h1">
-                Good meeting you —{" "}
-                <span className="rli-accent">don&apos;t wait too long to take a look</span>.
-              </h1>
-              <p className="rli-hero-p">
-                Storm damage isn&apos;t always obvious right away. It&apos;s worth taking a look sooner rather than later — this makes it easy to get started.
-              </p>
+              {template.badge && <div className="rli-eyebrow">{template.badge}</div>}
+              <h1 className="rli-h1">{template.headline}</h1>
+              <p className="rli-hero-p">{template.intro}</p>
 
               <div className="rli-hero-actions">
                 {rep.phone && (
@@ -526,18 +548,16 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Start My Inspection
+                    {template.primaryCtaText}
                   </a>
                 ) : (
                   <button className="rli-btn rli-btn-primary" onClick={openForm}>
-                    Start My Inspection
+                    {template.primaryCtaText}
                   </button>
                 )}
               </div>
 
-              <div className="rli-micro-note">
-                Fastest next step: send a quick text and I&apos;ll take it from there.
-              </div>
+              {template.microNote && <div className="rli-micro-note">{template.microNote}</div>}
 
               <div className="rli-contact-strip">
                 {rep.phone && <span>📱 {rep.phone}</span>}
@@ -566,14 +586,16 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
                     )}
                     <div>
                       <span className="rli-dot">🌐</span>
-                      <span>www.mcgeerestoration.com</span>
+                      <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                        {websiteLabel}
+                      </a>
                     </div>
                   </div>
                 </div>
                 <div className="rli-logo-side">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/logo.png" alt={`${businessName} logo`} className="rli-logo-img" />
-                  <div className="rli-tagline">Roofing | Siding | Windows</div>
+                  <img src={logoSrc} alt={`${businessName} logo`} className="rli-logo-img" />
+                  {template.serviceLine && <div className="rli-tagline">{template.serviceLine}</div>}
                 </div>
               </div>
             </div>
@@ -585,10 +607,8 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
             {step === "profile" && (
               <>
                 <div>
-                  <h3>The sooner we check it, the better.</h3>
-                  <p>
-                    We&apos;ll take a look, document anything we find, and walk you through your options — including insurance if it applies.
-                  </p>
+                  <h3>{template.ctaHeading}</h3>
+                  <p>{template.ctaBody}</p>
                 </div>
                 <div className="rli-hero-actions">
                   {rep.phone && (
@@ -611,11 +631,11 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Book Inspection
+                      {template.primaryCtaText}
                     </a>
                   ) : (
                     <button className="rli-btn rli-btn-primary" onClick={openForm}>
-                      Request Inspection
+                      {template.primaryCtaText}
                     </button>
                   )}
                 </div>
@@ -628,18 +648,20 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
                   <button
                     onClick={() => setStep("profile")}
                     style={{
-                      background: "none", border: "none",
-                      color: "var(--muted)", cursor: "pointer",
-                      fontSize: "0.95rem", fontFamily: "inherit", padding: 0,
+                      background: "none",
+                      border: "none",
+                      color: "var(--muted)",
+                      cursor: "pointer",
+                      fontSize: "0.95rem",
+                      fontFamily: "inherit",
+                      padding: 0,
                     }}
                   >
                     ← Back
                   </button>
                 </div>
-                <h3 style={{ margin: "0 0 6px" }}>Request a free inspection</h3>
-                <p style={{ margin: "0 0 16px", color: "var(--muted)", lineHeight: 1.7 }}>
-                  Tell us a little about your property and {firstName} will get back to you fast.
-                </p>
+                <h3 style={{ margin: "0 0 6px" }}>{template.formHeading}</h3>
+                <p style={{ margin: "0 0 16px", color: "var(--muted)", lineHeight: 1.7 }}>{formBody}</p>
                 {error && <div className="rli-error">{error}</div>}
                 <form onSubmit={handleSubmit} className="rli-form-grid">
                   <input className="rli-form-input" placeholder="Your name *" value={form.name} onChange={(e) => update("name", e.target.value)} required autoFocus />
@@ -648,7 +670,7 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
                   <input className="rli-form-input" placeholder="Property address" value={form.address} onChange={(e) => update("address", e.target.value)} />
                   <textarea className="rli-form-input" rows={3} style={{ resize: "none" }} placeholder="Briefly describe what you're seeing: hail, leaks, missing shingles, siding damage, etc." value={form.notes} onChange={(e) => update("notes", e.target.value)} />
                   <button type="submit" disabled={submitting} className="rli-btn rli-btn-primary" style={{ width: "100%" }}>
-                    {submitting ? "Sending…" : "Send Inspection Request"}
+                    {submitting ? "Sending..." : "Send Inspection Request"}
                   </button>
                 </form>
               </div>
@@ -657,10 +679,8 @@ export default function RepLandingClient({ rep }: { rep: Rep }) {
             {step === "success" && (
               <div className="rli-success-box">
                 <div style={{ fontSize: "2.5rem", marginBottom: "12px" }}>✓</div>
-                <h3 style={{ margin: 0 }}>Request received. You&apos;re in good hands.</h3>
-                <p>
-                  {rep.name} will follow up shortly to schedule your free inspection and walk you through the next steps.
-                </p>
+                <h3 style={{ margin: 0 }}>{template.successHeading}</h3>
+                <p>{successBody}</p>
                 {rep.phone && (
                   <a className="rli-btn rli-btn-secondary" href={`tel:${rep.phone}`} style={{ display: "inline-flex", marginTop: "18px" }}>
                     Call {rep.phone}
