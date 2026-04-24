@@ -136,8 +136,8 @@ export default function RepLandingEditorPage() {
         {loading ? (
           <div className="text-slate-400 text-sm">Loading...</div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1.15fr 0.85fr", gap: "24px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-5">
               <div className="card">
                 <h3 className="text-white font-semibold mb-4" style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8" }}>
                   Branding
@@ -188,7 +188,9 @@ export default function RepLandingEditorPage() {
                 <input className="input" value={data.formHeading} onChange={(e) => update("formHeading", e.target.value)} />
                 <label className="label mt-3">Form body</label>
                 <textarea className="input" rows={3} value={data.formBody} onChange={(e) => update("formBody", e.target.value)} style={{ resize: "vertical" }} />
-                <p className="text-slate-500 text-xs mt-1">Available tokens: <code className="text-orange-400">{{firstName}}</code>, <code className="text-orange-400">{{repName}}</code>, <code className="text-orange-400">{{companyName}}</code></p>
+                <p className="text-slate-500 text-xs mt-1">
+                  Available tokens: <code className="text-orange-400">{"{{firstName}}"}</code>, <code className="text-orange-400">{"{{repName}}"}</code>, <code className="text-orange-400">{"{{companyName}}"}</code>
+                </p>
                 <label className="label mt-3">Success heading</label>
                 <input className="input" value={data.successHeading} onChange={(e) => update("successHeading", e.target.value)} />
                 <label className="label mt-3">Success body</label>
@@ -196,7 +198,7 @@ export default function RepLandingEditorPage() {
               </div>
             </div>
 
-            <div style={{ position: "sticky", top: "80px", alignSelf: "flex-start" }}>
+            <div className="xl:sticky xl:top-20 self-start">
               <div style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
                 <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Preview
