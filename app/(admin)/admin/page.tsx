@@ -28,7 +28,10 @@ async function getJson<T>(url: string): Promise<T> {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const message = typeof (data as { error?: unknown }).error === "string" ? (data as { error: string }).error : `Request failed: ${response.status}`;
+    const message =
+      typeof (data as { error?: unknown }).error === "string"
+        ? (data as { error: string }).error
+        : `Request failed: ${response.status}`;
     throw new Error(message);
   }
 
@@ -120,7 +123,9 @@ export default function AdminDashboard() {
               <div className="card">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold text-white">Rep Leaderboard</h2>
-                  <Link href="/admin/reps" className="text-orange-400 text-sm hover:underline">View all →</Link>
+                  <Link href="/admin/reps" className="text-orange-400 text-sm hover:underline">
+                    View all →
+                  </Link>
                 </div>
                 <div className="space-y-3">
                   {reps.map((rep, i) => (
@@ -147,7 +152,9 @@ export default function AdminDashboard() {
               <div className="card">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold text-white">Recent Leads</h2>
-                  <Link href="/admin/leads" className="text-orange-400 text-sm hover:underline">View all →</Link>
+                  <Link href="/admin/leads" className="text-orange-400 text-sm hover:underline">
+                    View all →
+                  </Link>
                 </div>
                 <div className="space-y-3">
                   {recentLeads.map((lead) => (
@@ -157,7 +164,9 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-sm font-medium truncate">{lead.name}</p>
-                        <p className="text-slate-500 text-xs">via {lead.rep?.name ?? "Unknown rep"} · {new Date(lead.createdAt).toLocaleDateString()}</p>
+                        <p className="text-slate-500 text-xs">
+                          via {lead.rep?.name ?? "Unknown rep"} · {new Date(lead.createdAt).toLocaleDateString()}
+                        </p>
                       </div>
                       <StatusBadge status={lead.status} />
                     </div>
@@ -192,10 +201,33 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="card mb-6">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <h2 className="font-semibold text-white">Rep Landing Page Template</h2>
+                  <p className="text-slate-400 text-sm mt-1 max-w-2xl">
+                    Edit the shared copy and branding for every rep page. Each rep still uses their own name, phone, email, title, company, and booking link.
+                  </p>
+                </div>
+                <div className="flex gap-3 flex-wrap">
+                  <Link href="/admin/rep-landing" className="btn-primary">
+                    Edit template
+                  </Link>
+                  <Link href="/admin/reps" className="btn-secondary">
+                    Open reps
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
               <Link href="/admin/reps/new" className="card hover:border-orange-500/50 transition-colors text-center py-5 cursor-pointer">
                 <div className="text-2xl mb-2">➕</div>
                 <div className="text-sm font-medium text-white">Add Rep</div>
+              </Link>
+              <Link href="/admin/rep-landing" className="card hover:border-amber-500/50 transition-colors text-center py-5 cursor-pointer">
+                <div className="text-2xl mb-2">📱</div>
+                <div className="text-sm font-medium text-white">Rep Landing</div>
               </Link>
               <Link href="/admin/leads" className="card hover:border-blue-500/50 transition-colors text-center py-5 cursor-pointer">
                 <div className="text-2xl mb-2">📋</div>
