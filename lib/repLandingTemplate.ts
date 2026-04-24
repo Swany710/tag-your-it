@@ -17,6 +17,10 @@ export type RepLandingTemplateData = {
   logoUrl: string;
 };
 
+type RepLandingTemplateInput = Partial<RepLandingTemplateData> & {
+  logoUrl?: string | null;
+};
+
 export const DEFAULT_REP_LANDING_TEMPLATE: RepLandingTemplateData = {
   companyName: "AMRG Exteriors",
   badge: "Good meeting you",
@@ -41,7 +45,7 @@ export const DEFAULT_REP_LANDING_TEMPLATE: RepLandingTemplateData = {
 };
 
 export function normalizeRepLandingTemplate(
-  value?: Partial<RepLandingTemplateData> | null
+  value?: RepLandingTemplateInput | null
 ): RepLandingTemplateData {
   const merged = {
     ...DEFAULT_REP_LANDING_TEMPLATE,
