@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── Admin users ────────────────────────────────────────────
+// ---------------- Admin users ----------------------------
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -22,7 +22,7 @@ enum Role {
   ADMIN
 }
 
-// ─── Reps (serialized NFC identities) ───────────────────────
+// ---------------- Reps (serialized NFC identities) -------------------
 model Rep {
   id        Int      @id              // 1..n (maps directly to /r/1, /r/2, etc.)
   name      String
@@ -43,7 +43,7 @@ model Rep {
   tags   Tag[]
 }
 
-// ─── Physical NFC tags ───────────────────────────────────────
+// ---------------- Physical NFC tags -----------------------
 model Tag {
   id         String    @id @default(cuid())
   uid        String?   @unique  // physical NFC chip UID (optional, for inventory)
@@ -68,7 +68,7 @@ enum TagType {
   STATIC      // general info
 }
 
-// ─── Lead capture ────────────────────────────────────────────
+// ---------------- Lead capture ----------------------------
 model Lead {
   id        String   @id @default(cuid())
   repId     Int
@@ -99,7 +99,7 @@ enum LeadStatus {
   LOST
 }
 
-// ─── Analytics events ────────────────────────────────────────
+// ---------------- Analytics events ------------------------
 model Event {
   id        String   @id @default(cuid())
   repId     Int
@@ -119,9 +119,9 @@ enum EventType {
   CONTACT_SAVE
 }
 
-// ─── Customer-facing deals/promo page (singleton, id=1) ──────
+// ---------------- Customer-facing deals/promo page (singleton, id=1) ------
 model DealPage {
-  id          Int      @id @default(1)  // singleton — always upsert on id=1
+  id          Int      @id @default(1)  // singleton - always upsert on id=1
   isLive      Boolean  @default(true)
   badge       String   @default("Limited Time Offer")
   headline    String   @default("Special Offer for You")
@@ -134,7 +134,29 @@ model DealPage {
   updatedAt   DateTime @updatedAt
 }
 
-// ─── Job completions ─────────────────────────────────────────
+// ---------------- Shared rep landing template (singleton, id=1) ------
+model RepLandingPage {
+  id             Int      @id @default(1)
+  companyName    String   @default("AMRG Exteriors")
+  badge          String   @default("Good meeting you")
+  headline       String   @default("Good meeting you - don't wait too long to take a look.")
+  intro          String   @default("Storm damage isn't always obvious right away. It's worth taking a look sooner rather than later - this makes it easy to get started.")
+  primaryCtaText String   @default("Start My Inspection")
+  microNote      String   @default("Fastest next step: send a quick text and I'll take it from there.")
+  serviceLine    String   @default("Roofing | Siding | Windows")
+  websiteLabel   String   @default("www.mcgeerestoration.com")
+  websiteUrl     String   @default("https://www.mcgeerestoration.com")
+  ctaHeading     String   @default("The sooner we check it, the better.")
+  ctaBody        String   @default("We'll take a look, document anything we find, and walk you through your options - including insurance if it applies.")
+  formHeading    String   @default("Request a free inspection")
+  formBody       String   @default("Tell us a little about your property and {{firstName}} will get back to you fast.")
+  successHeading String   @default("Request received. You're in good hands.")
+  successBody    String   @default("{{repName}} will follow up shortly to schedule your free inspection and walk you through the next steps.")
+  logoUrl        String?
+  updatedAt      DateTime @updatedAt
+}
+
+// ---------------- Job completions -------------------------
 model Job {
   id              String   @id @default(cuid())
   jobNumber       String?  @unique
