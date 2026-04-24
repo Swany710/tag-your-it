@@ -21,9 +21,9 @@ interface Rep {
 export default function EditRepPage() {
   const params = useParams();
   const router = useRouter();
-  const [rep, setRep]       = useState<Rep | null>(null);
+  const [rep, setRep] = useState<Rep | null>(null);
   const [saving, setSaving] = useState(false);
-  const [error, setError]   = useState("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -32,12 +32,15 @@ export default function EditRepPage() {
   useEffect(() => {
     fetch(`/api/reps/${params.id}`)
       .then((r) => r.json())
-      .then((d) => { setRep(d.rep); setLoading(false); })
+      .then((d) => {
+        setRep(d.rep);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, [params.id]);
 
   function update(key: string, val: string | boolean) {
-    setRep((r) => r ? { ...r, [key]: val } : r);
+    setRep((r) => (r ? { ...r, [key]: val } : r));
     setSuccess(false);
   }
 
@@ -69,30 +72,31 @@ export default function EditRepPage() {
     if (res.ok) router.push("/admin/reps");
   }
 
-  if (loading) return (
-    <AdminShell>
-      <div className="p-8 text-slate-400 text-sm">Loading...</div>
-    </AdminShell>
-  );
+  if (loading)
+    return (
+      <AdminShell>
+        <div className="p-8 text-slate-400 text-sm">Loading...</div>
+      </AdminShell>
+    );
 
-  if (!rep) return (
-    <AdminShell>
-      <div className="p-8 text-red-400 text-sm">Rep not found.</div>
-    </AdminShell>
-  );
+  if (!rep)
+    return (
+      <AdminShell>
+        <div className="p-8 text-red-400 text-sm">Rep not found.</div>
+      </AdminShell>
+    );
 
   return (
     <AdminShell>
       <div className="p-8 max-w-2xl mx-auto">
-
-        {/* Breadcrumb */}
         <div className="flex items-center gap-3 mb-6">
-          <Link href="/admin/reps" className="text-slate-400 hover:text-white text-sm">← Reps</Link>
+          <Link href="/admin/reps" className="text-slate-400 hover:text-white text-sm">
+            ← Reps
+          </Link>
           <span className="text-slate-700">/</span>
           <h1 className="text-xl font-bold text-white">Rep #{rep.id} — {rep.name}</h1>
         </div>
 
-        {/* NFC URL */}
         <div className="card mb-5 flex items-center gap-3">
           <span className="text-green-400 text-xl">📡</span>
           <div className="flex-1">
@@ -104,8 +108,20 @@ export default function EditRepPage() {
           </a>
         </div>
 
+        <div className="card mb-5 flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-white text-sm font-medium">Shared landing copy lives in the template editor.</p>
+            <p className="text-slate-400 text-xs mt-1">
+              Update this rep's personal info here, then use the shared template for the common hero, CTA, and success copy.
+            </p>
+          </div>
+          <Link href="/admin/rep-landing" className="btn-secondary text-xs">
+            Edit template
+          </Link>
+        </div>
+
         <form onSubmit={handleSave} className="card space-y-5">
-          {error   && <div className="bg-red-900/50   border border-red-700   text-red-300   text-sm rounded-lg px-3 py-2">{error}</div>}
+          {error && <div className="bg-red-900/50 border border-red-700 text-red-300 text-sm rounded-lg px-3 py-2">{error}</div>}
           {success && <div className="bg-green-900/50 border border-green-700 text-green-300 text-sm rounded-lg px-3 py-2">✓ Saved successfully.</div>}
 
           <div className="grid grid-cols-2 gap-4">
