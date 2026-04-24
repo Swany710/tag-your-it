@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { normalizeRepLandingTemplate } from "@/lib/repLandingTemplate";
 import { notFound, redirect } from "next/navigation";
 import RepLandingClient from "./RepLandingClient";
 
@@ -16,22 +17,38 @@ export default async function RepPage({ params }: Props) {
   if (!rep || !rep.isActive) return notFound();
 
   if (rep.redirectUrl) {
-    prisma.event.create({
-      data: { repId, type: "TAP", meta: { path: `/r/${repId}`, redirected: true } },
-    }).catch(() => {});
+    prisma.event
+      .create({
+        data: { repId, type: "TAP", meta: { path: `/r/${repId}`, redirected: true } },
+      })
+      .catch(() => {});
 
     redirect(rep.redirectUrl);
   }
 
-  return <RepLandingClient rep={{
-    id: rep.id,
-    name: rep.name,
-    phone: rep.phone,
-    email: rep.email,
-    title: rep.title,
-    company: rep.company,
-    bio: rep.bio,
-    photoUrl: rep.photoUrl,
-    calLink: rep.calLink,
-  }} />;
+  let template = normalizeRepLandingTemplate();
+
+  try {
+    const storedTemplate = await prisma.repLandingPage.findUnique({ where: { id: 1 } });
+    template = normalizeRepLandingTemplate(storedTemplate);
+  } catch {
+    template = normalizeRepLandingTemplate();
+  }
+
+  return (
+    <RepLandingClient
+      rep={{
+        id: rep.id,
+        name: rep.name,
+        phone: rep.phone,
+        email: rep.email,
+        title: rep.title,
+        company: rep.company,
+        bio: rep.bio,
+        photoUrl: rep.photoUrl,
+        calLink: rep.calLink,
+      }}
+      template={template}
+    />
+  );
 }
