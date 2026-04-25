@@ -10,10 +10,24 @@ import {
 } from "@/lib/repLandingTemplate";
 
 const SAMPLE_REP = {
+  id: 0,
   name: "Eric Swanberg",
   title: "Exterior Renovation Consultant",
+  role: "AMRG Exteriors",
   phone: "(612) 513-7534",
   email: "ericswanberg@mcgeerestoration.com",
+  photoUrl: "",
+};
+
+type RepOption = {
+  id: number;
+  name: string;
+  title: string | null;
+  company: string | null;
+  phone: string | null;
+  email: string | null;
+  photoUrl: string | null;
+  isActive: boolean;
 };
 
 function fillTemplate(value: string, replacements: Record<string, string>) {
@@ -24,16 +38,50 @@ function fillTemplate(value: string, replacements: Record<string, string>) {
 
 export default function RepLandingEditorPage() {
   const [data, setData] = useState<RepLandingTemplateData>(DEFAULT_REP_LANDING_TEMPLATE);
+  const [reps, setReps] = useState<RepOption[]>([]);
+  const [selectedRepId, setSelectedRepId] = useState<number>(0);
+  const [repForm, setRepForm] = useState({
+    name: SAMPLE_REP.name,
+    title: SAMPLE_REP.title,
+    role: SAMPLE_REP.role,
+    phone: SAMPLE_REP.phone,
+    email: SAMPLE_REP.email,
+    photoUrl: SAMPLE_REP.photoUrl,
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [repSaving, setRepSaving] = useState(false);
+  const [repSaved, setRepSaved] = useState(false);
   const [error, setError] = useState("");
+  const [repError, setRepError] = useState("");
 
   useEffect(() => {
-    fetch("/api/rep-landing-page")
-      .then((r) => r.json())
-      .then(({ page }) => {
-        setData(normalizeRepLandingTemplate(page));
+    Promise.all([
+      fetch("/api/rep-landing-page").then((r) => r.json()),
+      fetch("/api/reps").then((r) => r.json()).catch(() => ({ reps: [] })),
+    ])
+      .then(([templatePayload, repsPayload]) => {
+        setData(normalizeRepLandingTemplate(templatePayload?.page));
+
+        const loadedReps = Array.isArray(repsPayload?.reps)
+          ? (repsPayload.reps as RepOption[])
+          : [];
+        setReps(loadedReps);
+
+        const initialRep = loadedReps.find((rep) => rep.isActive) ?? loadedReps[0];
+        if (initialRep) {
+          setSelectedRepId(initialRep.id);
+          setRepForm({
+            name: initialRep.name || "",
+            title: initialRep.title || "",
+            role: initialRep.company || "",
+            phone: initialRep.phone || "",
+            email: initialRep.email || "",
+            photoUrl: initialRep.photoUrl || "",
+          });
+        }
+
         setLoading(false);
       })
       .catch(() => {
@@ -46,6 +94,32 @@ export default function RepLandingEditorPage() {
     setData((current) => ({ ...current, [field]: value }));
     setSaved(false);
     setError("");
+  }
+
+  function updateRepField(
+    field: "name" | "title" | "role" | "phone" | "email" | "photoUrl",
+    value: string
+  ) {
+    setRepForm((current) => ({ ...current, [field]: value }));
+    setRepSaved(false);
+    setRepError("");
+  }
+
+  function handleRepSelection(repId: number) {
+    setSelectedRepId(repId);
+    const rep = reps.find((candidate) => candidate.id === repId);
+    if (!rep) return;
+
+    setRepForm({
+      name: rep.name || "",
+      title: rep.title || "",
+      role: rep.company || "",
+      phone: rep.phone || "",
+      email: rep.email || "",
+      photoUrl: rep.photoUrl || "",
+    });
+    setRepSaved(false);
+    setRepError("");
   }
 
   async function handleSave() {
@@ -75,17 +149,83 @@ export default function RepLandingEditorPage() {
     setSaving(false);
   }
 
-  const companyName = data.companyName || "Company";
+  async function handleSaveRep() {
+    if (!selectedRepId) {
+      setRepError("Create or choose a rep first in the Reps tab.");
+      return;
+    }
+
+    if (!repForm.name.trim()) {
+      setRepError("Rep name is required.");
+      return;
+    }
+
+    setRepSaving(true);
+    setRepError("");
+
+    const res = await fetch(`/api/reps/${selectedRepId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: repForm.name.trim(),
+        title: repForm.title.trim(),
+        company: repForm.role.trim(),
+        phone: repForm.phone.trim(),
+        email: repForm.email.trim(),
+        photoUrl: repForm.photoUrl.trim(),
+      }),
+    });
+
+    if (res.ok) {
+      const payload = await res.json().catch(() => null);
+      const rep = payload?.rep;
+      if (rep) {
+        setReps((current) =>
+          current.map((candidate) =>
+            candidate.id === rep.id
+              ? {
+                  ...candidate,
+                  name: rep.name ?? "",
+                  title: rep.title ?? "",
+                  company: rep.company ?? "",
+                  phone: rep.phone ?? "",
+                  email: rep.email ?? "",
+                  photoUrl: rep.photoUrl ?? "",
+                }
+              : candidate
+          )
+        );
+      }
+      setRepSaved(true);
+      setTimeout(() => setRepSaved(false), 3000);
+    } else {
+      const payload = await res.json().catch(() => ({}));
+      setRepError(typeof payload.error === "string" ? payload.error : "Failed to save rep info.");
+    }
+
+    setRepSaving(false);
+  }
+
+  const previewRep = {
+    id: selectedRepId || SAMPLE_REP.id,
+    name: repForm.name || SAMPLE_REP.name,
+    title: repForm.title || SAMPLE_REP.title,
+    role: repForm.role || SAMPLE_REP.role,
+    phone: repForm.phone || SAMPLE_REP.phone,
+    email: repForm.email || SAMPLE_REP.email,
+    photoUrl: repForm.photoUrl || SAMPLE_REP.photoUrl,
+  };
+  const companyName = previewRep.role || data.companyName || "Company";
   const websiteLabel = data.websiteLabel || data.websiteUrl;
-  const firstName = SAMPLE_REP.name.split(" ")[0];
+  const firstName = previewRep.name.split(" ")[0];
   const previewFormBody = fillTemplate(data.formBody, {
     firstName,
-    repName: SAMPLE_REP.name,
+    repName: previewRep.name,
     companyName,
   });
   const previewSuccessBody = fillTemplate(data.successBody, {
     firstName,
-    repName: SAMPLE_REP.name,
+    repName: previewRep.name,
     companyName,
   });
 
@@ -132,12 +272,73 @@ export default function RepLandingEditorPage() {
             {error}
           </div>
         )}
+        {repError && (
+          <div className="bg-red-900/50 border border-red-700 text-red-300 text-sm rounded-lg px-3 py-2 mb-5">
+            {repError}
+          </div>
+        )}
 
         {loading ? (
           <div className="text-slate-400 text-sm">Loading...</div>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <div className="flex flex-col gap-5">
+              <div className="card">
+                <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                  <h3 className="text-white font-semibold" style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8" }}>
+                    Rep Info
+                  </h3>
+                  <button onClick={handleSaveRep} disabled={repSaving || loading || !selectedRepId} className="btn-primary text-xs py-1.5 px-3">
+                    {repSaving ? "Saving..." : repSaved ? "Saved!" : "Save Rep Info"}
+                  </button>
+                </div>
+
+                <label className="label">Rep slot</label>
+                <select
+                  className="input"
+                  value={selectedRepId || ""}
+                  onChange={(e) => handleRepSelection(Number(e.target.value))}
+                >
+                  {!selectedRepId && <option value="">Select a rep</option>}
+                  {reps.map((rep) => (
+                    <option key={rep.id} value={rep.id}>
+                      #{rep.id} · {rep.name} {rep.isActive ? "(active)" : "(inactive)"}
+                    </option>
+                  ))}
+                </select>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className="label">Name</label>
+                    <input className="input" value={repForm.name} onChange={(e) => updateRepField("name", e.target.value)} placeholder="Rep name" />
+                  </div>
+                  <div>
+                    <label className="label">Title</label>
+                    <input className="input" value={repForm.title} onChange={(e) => updateRepField("title", e.target.value)} placeholder="Exterior Renovation Consultant" />
+                  </div>
+                </div>
+
+                <label className="label mt-3">Role</label>
+                <input className="input" value={repForm.role} onChange={(e) => updateRepField("role", e.target.value)} placeholder="AMRG Exteriors" />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className="label">Phone</label>
+                    <input className="input" value={repForm.phone} onChange={(e) => updateRepField("phone", e.target.value)} placeholder="(555) 555-5555" />
+                  </div>
+                  <div>
+                    <label className="label">Email</label>
+                    <input className="input" type="email" value={repForm.email} onChange={(e) => updateRepField("email", e.target.value)} placeholder="name@company.com" />
+                  </div>
+                </div>
+
+                <label className="label mt-3">Headshot image URL</label>
+                <input className="input" type="url" value={repForm.photoUrl} onChange={(e) => updateRepField("photoUrl", e.target.value)} placeholder="https://... (SharePoint URL)" />
+                <p className="text-slate-500 text-xs mt-2">
+                  This fills each rep's own landing page while the sections below stay reusable as the shared blank template.
+                </p>
+              </div>
+
               <div className="card">
                 <h3 className="text-white font-semibold mb-4" style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8" }}>
                   Branding
@@ -220,11 +421,14 @@ export default function RepLandingEditorPage() {
                     <div style={{ color: "#fbbf24", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>
                       {companyName}
                     </div>
-                    <div style={{ color: "white", fontSize: "20px", fontWeight: 800, marginTop: "6px" }}>{SAMPLE_REP.name}</div>
-                    <div style={{ color: "#f59e0b", fontSize: "13px", marginTop: "6px" }}>{SAMPLE_REP.title}</div>
+                    <div style={{ color: "white", fontSize: "20px", fontWeight: 800, marginTop: "6px" }}>{previewRep.name}</div>
+                    <div style={{ color: "#f59e0b", fontSize: "13px", marginTop: "6px" }}>{previewRep.title}</div>
                   </div>
                   <div style={{ width: "72px", height: "72px", borderRadius: "18px", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", display: "grid", placeItems: "center", color: "#fbbf24", fontSize: "28px", overflow: "hidden" }}>
-                    {data.logoUrl ? (
+                    {previewRep.photoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={previewRep.photoUrl} alt={previewRep.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : data.logoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={data.logoUrl} alt={companyName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     ) : (
@@ -256,8 +460,8 @@ export default function RepLandingEditorPage() {
                 )}
 
                 <div style={{ marginTop: "18px", display: "grid", gap: "8px", color: "#cbd5e1", fontSize: "13px" }}>
-                  <div>{SAMPLE_REP.phone}</div>
-                  <div>{SAMPLE_REP.email}</div>
+                  <div>{previewRep.phone}</div>
+                  <div>{previewRep.email}</div>
                   <div>{websiteLabel}</div>
                 </div>
 

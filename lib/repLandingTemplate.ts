@@ -17,7 +17,7 @@ export type RepLandingTemplateData = {
   logoUrl: string;
 };
 
-type RepLandingTemplateInput = Partial<RepLandingTemplateData> & {
+type RepLandingTemplateInput = Omit<Partial<RepLandingTemplateData>, "logoUrl"> & {
   logoUrl?: string | null;
 };
 
