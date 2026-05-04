@@ -41,11 +41,15 @@ export default async function RepPage({ params }: Props) {
         id: rep.id,
         name: rep.name,
         phone: rep.phone,
+        officePhone: rep.officePhone,
         email: rep.email,
         title: rep.title,
         company: rep.company,
         bio: rep.bio,
         photoUrl: rep.photoUrl,
+        websiteLabel: rep.websiteLabel,
+        websiteUrl: rep.websiteUrl,
+        address: rep.address,
         calLink: rep.calLink,
       }}
       template={template}

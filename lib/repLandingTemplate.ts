@@ -41,7 +41,7 @@ export const DEFAULT_REP_LANDING_TEMPLATE: RepLandingTemplateData = {
   successHeading: "Request received. You're in good hands.",
   successBody:
     "{{repName}} will follow up shortly to schedule your free inspection and walk you through the next steps.",
-  logoUrl: "",
+  logoUrl: "/rep-landing-logo.svg",
 };
 
 export function normalizeRepLandingTemplate(
@@ -70,6 +70,6 @@ export function normalizeRepLandingTemplate(
     successHeading:
       merged.successHeading?.trim() || DEFAULT_REP_LANDING_TEMPLATE.successHeading,
     successBody: merged.successBody?.trim() || DEFAULT_REP_LANDING_TEMPLATE.successBody,
-    logoUrl: merged.logoUrl?.trim() || "",
+    logoUrl: merged.logoUrl?.trim() || DEFAULT_REP_LANDING_TEMPLATE.logoUrl,
   };
 }

@@ -13,11 +13,15 @@ export default function NewRepPage() {
     id: "",
     name: "",
     phone: "",
+    officePhone: "",
     email: "",
     title: "",
     company: "",
     bio: "",
     photoUrl: "",
+    websiteLabel: "",
+    websiteUrl: "",
+    address: "",
     calLink: "",
   });
 
@@ -99,7 +103,7 @@ export default function NewRepPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">Phone</label>
+              <label className="label">Mobile Phone</label>
               <input
                 className="input"
                 value={form.phone}
@@ -108,15 +112,25 @@ export default function NewRepPage() {
               />
             </div>
             <div>
-              <label className="label">Email</label>
+              <label className="label">Office Phone</label>
               <input
-                type="email"
                 className="input"
-                value={form.email}
-                onChange={(e) => update("email", e.target.value)}
-                placeholder="john@company.com"
+                value={form.officePhone}
+                onChange={(e) => update("officePhone", e.target.value)}
+                placeholder="952-555-5555"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="label">Email</label>
+            <input
+              type="email"
+              className="input"
+              value={form.email}
+              onChange={(e) => update("email", e.target.value)}
+              placeholder="john@company.com"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -158,6 +172,39 @@ export default function NewRepPage() {
               value={form.photoUrl}
               onChange={(e) => update("photoUrl", e.target.value)}
               placeholder="https://..."
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label">Website Label</label>
+              <input
+                className="input"
+                value={form.websiteLabel}
+                onChange={(e) => update("websiteLabel", e.target.value)}
+                placeholder="www.company.com"
+              />
+            </div>
+            <div>
+              <label className="label">Website URL</label>
+              <input
+                type="url"
+                className="input"
+                value={form.websiteUrl}
+                onChange={(e) => update("websiteUrl", e.target.value)}
+                placeholder="https://www.company.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="label">Office Address</label>
+            <textarea
+              className="input"
+              rows={3}
+              value={form.address}
+              onChange={(e) => update("address", e.target.value)}
+              placeholder={"10201 Wayzata Blvd #130\nMinnetonka, MN 55305"}
             />
           </div>
 

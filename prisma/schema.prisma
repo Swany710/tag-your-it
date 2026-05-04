@@ -27,11 +27,15 @@ model Rep {
   id        Int      @id              // 1..n (maps directly to /r/1, /r/2, etc.)
   name      String
   phone     String?
+  officePhone String?
   email     String?
   title     String?
   company   String?
   bio       String?
   photoUrl  String?
+  websiteLabel String?
+  websiteUrl String?
+  address   String?
   calLink      String?  // booking link (Calendly, etc.)
   redirectUrl  String?  // if set, tap redirects here instead of showing profile
   isActive     Boolean  @default(true)

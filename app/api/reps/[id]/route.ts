@@ -31,10 +31,42 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
 
-  const allowed = ["name", "phone", "email", "title", "company", "bio", "photoUrl", "calLink", "isActive", "redirectUrl"];
+  const allowed = [
+    "name",
+    "phone",
+    "officePhone",
+    "email",
+    "title",
+    "company",
+    "bio",
+    "photoUrl",
+    "websiteLabel",
+    "websiteUrl",
+    "address",
+    "calLink",
+    "isActive",
+    "redirectUrl",
+  ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
-    if (key in body) data[key] = body[key];
+    if (!(key in body)) continue;
+
+    if (key === "isActive") {
+      data[key] = Boolean(body[key]);
+      continue;
+    }
+
+    if (typeof body[key] === "string") {
+      const trimmed = body[key].trim();
+      data[key] = key === "name" ? trimmed : trimmed || null;
+      continue;
+    }
+
+    data[key] = body[key];
+  }
+
+  if ("name" in data && typeof data.name === "string" && data.name.length < 2) {
+    return NextResponse.json({ error: "A rep name is required" }, { status: 400 });
   }
 
   const rep = await prisma.rep.update({

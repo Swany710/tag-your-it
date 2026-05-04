@@ -3,20 +3,27 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
+import RepLandingExperience, { type RepLandingRep } from "@/components/reps/RepLandingExperience";
 import {
   DEFAULT_REP_LANDING_TEMPLATE,
   normalizeRepLandingTemplate,
   type RepLandingTemplateData,
 } from "@/lib/repLandingTemplate";
 
-const SAMPLE_REP = {
+const SAMPLE_REP: RepLandingRep = {
   id: 0,
   name: "Eric Swanberg",
   title: "Exterior Renovation Consultant",
-  role: "AMRG Exteriors",
+  company: "AMRG Exteriors",
   phone: "(612) 513-7534",
+  officePhone: "(952) 426-3736",
   email: "ericswanberg@mcgeerestoration.com",
+  bio: "",
   photoUrl: "",
+  websiteLabel: "www.mcgeerestoration.com",
+  websiteUrl: "https://www.mcgeerestoration.com",
+  address: "10201 Wayzata Blvd #130\nMinnetonka, MN 55305",
+  calLink: "",
 };
 
 type RepOption = {
@@ -25,29 +32,54 @@ type RepOption = {
   title: string | null;
   company: string | null;
   phone: string | null;
+  officePhone: string | null;
   email: string | null;
+  bio: string | null;
   photoUrl: string | null;
+  websiteLabel: string | null;
+  websiteUrl: string | null;
+  address: string | null;
+  calLink: string | null;
   isActive: boolean;
 };
 
-function fillTemplate(value: string, replacements: Record<string, string>) {
-  return value.replace(/{{\s*(firstName|repName|companyName)\s*}}/g, (_, key: string) => {
-    return replacements[key] ?? "";
-  });
+type RepForm = {
+  name: string;
+  title: string;
+  company: string;
+  phone: string;
+  officePhone: string;
+  email: string;
+  bio: string;
+  photoUrl: string;
+  websiteLabel: string;
+  websiteUrl: string;
+  address: string;
+  calLink: string;
+};
+
+function toRepForm(rep?: Partial<RepOption> | null): RepForm {
+  return {
+    name: rep?.name || SAMPLE_REP.name,
+    title: rep?.title || SAMPLE_REP.title || "",
+    company: rep?.company || SAMPLE_REP.company || "",
+    phone: rep?.phone || SAMPLE_REP.phone || "",
+    officePhone: rep?.officePhone || SAMPLE_REP.officePhone || "",
+    email: rep?.email || SAMPLE_REP.email || "",
+    bio: rep?.bio || SAMPLE_REP.bio || "",
+    photoUrl: rep?.photoUrl || SAMPLE_REP.photoUrl || "",
+    websiteLabel: rep?.websiteLabel || SAMPLE_REP.websiteLabel || "",
+    websiteUrl: rep?.websiteUrl || SAMPLE_REP.websiteUrl || "",
+    address: rep?.address || SAMPLE_REP.address || "",
+    calLink: rep?.calLink || SAMPLE_REP.calLink || "",
+  };
 }
 
 export default function RepLandingEditorPage() {
   const [data, setData] = useState<RepLandingTemplateData>(DEFAULT_REP_LANDING_TEMPLATE);
   const [reps, setReps] = useState<RepOption[]>([]);
   const [selectedRepId, setSelectedRepId] = useState<number>(0);
-  const [repForm, setRepForm] = useState({
-    name: SAMPLE_REP.name,
-    title: SAMPLE_REP.title,
-    role: SAMPLE_REP.role,
-    phone: SAMPLE_REP.phone,
-    email: SAMPLE_REP.email,
-    photoUrl: SAMPLE_REP.photoUrl,
-  });
+  const [repForm, setRepForm] = useState<RepForm>(toRepForm(null));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -72,14 +104,7 @@ export default function RepLandingEditorPage() {
         const initialRep = loadedReps.find((rep) => rep.isActive) ?? loadedReps[0];
         if (initialRep) {
           setSelectedRepId(initialRep.id);
-          setRepForm({
-            name: initialRep.name || "",
-            title: initialRep.title || "",
-            role: initialRep.company || "",
-            phone: initialRep.phone || "",
-            email: initialRep.email || "",
-            photoUrl: initialRep.photoUrl || "",
-          });
+          setRepForm(toRepForm(initialRep));
         }
 
         setLoading(false);
@@ -96,10 +121,7 @@ export default function RepLandingEditorPage() {
     setError("");
   }
 
-  function updateRepField(
-    field: "name" | "title" | "role" | "phone" | "email" | "photoUrl",
-    value: string
-  ) {
+  function updateRepField(field: keyof RepForm, value: string) {
     setRepForm((current) => ({ ...current, [field]: value }));
     setRepSaved(false);
     setRepError("");
@@ -108,16 +130,7 @@ export default function RepLandingEditorPage() {
   function handleRepSelection(repId: number) {
     setSelectedRepId(repId);
     const rep = reps.find((candidate) => candidate.id === repId);
-    if (!rep) return;
-
-    setRepForm({
-      name: rep.name || "",
-      title: rep.title || "",
-      role: rep.company || "",
-      phone: rep.phone || "",
-      email: rep.email || "",
-      photoUrl: rep.photoUrl || "",
-    });
+    setRepForm(toRepForm(rep));
     setRepSaved(false);
     setRepError("");
   }
@@ -163,35 +176,35 @@ export default function RepLandingEditorPage() {
     setRepSaving(true);
     setRepError("");
 
+    const payload = {
+      name: repForm.name.trim(),
+      title: repForm.title.trim(),
+      company: repForm.company.trim(),
+      phone: repForm.phone.trim(),
+      officePhone: repForm.officePhone.trim(),
+      email: repForm.email.trim(),
+      bio: repForm.bio.trim(),
+      photoUrl: repForm.photoUrl.trim(),
+      websiteLabel: repForm.websiteLabel.trim(),
+      websiteUrl: repForm.websiteUrl.trim(),
+      address: repForm.address.trim(),
+      calLink: repForm.calLink.trim(),
+    };
+
     const res = await fetch(`/api/reps/${selectedRepId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: repForm.name.trim(),
-        title: repForm.title.trim(),
-        company: repForm.role.trim(),
-        phone: repForm.phone.trim(),
-        email: repForm.email.trim(),
-        photoUrl: repForm.photoUrl.trim(),
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (res.ok) {
-      const payload = await res.json().catch(() => null);
-      const rep = payload?.rep;
+      const responsePayload = await res.json().catch(() => null);
+      const rep = responsePayload?.rep;
       if (rep) {
         setReps((current) =>
           current.map((candidate) =>
             candidate.id === rep.id
-              ? {
-                  ...candidate,
-                  name: rep.name ?? "",
-                  title: rep.title ?? "",
-                  company: rep.company ?? "",
-                  phone: rep.phone ?? "",
-                  email: rep.email ?? "",
-                  photoUrl: rep.photoUrl ?? "",
-                }
+              ? { ...candidate, ...rep }
               : candidate
           )
         );
@@ -199,39 +212,36 @@ export default function RepLandingEditorPage() {
       setRepSaved(true);
       setTimeout(() => setRepSaved(false), 3000);
     } else {
-      const payload = await res.json().catch(() => ({}));
-      setRepError(typeof payload.error === "string" ? payload.error : "Failed to save rep info.");
+      const responsePayload = await res.json().catch(() => ({}));
+      setRepError(
+        typeof responsePayload.error === "string"
+          ? responsePayload.error
+          : "Failed to save rep info."
+      );
     }
 
     setRepSaving(false);
   }
 
-  const previewRep = {
+  const previewRep: RepLandingRep = {
     id: selectedRepId || SAMPLE_REP.id,
     name: repForm.name || SAMPLE_REP.name,
     title: repForm.title || SAMPLE_REP.title,
-    role: repForm.role || SAMPLE_REP.role,
+    company: repForm.company || SAMPLE_REP.company,
     phone: repForm.phone || SAMPLE_REP.phone,
+    officePhone: repForm.officePhone || SAMPLE_REP.officePhone,
     email: repForm.email || SAMPLE_REP.email,
+    bio: repForm.bio || SAMPLE_REP.bio,
     photoUrl: repForm.photoUrl || SAMPLE_REP.photoUrl,
+    websiteLabel: repForm.websiteLabel || SAMPLE_REP.websiteLabel,
+    websiteUrl: repForm.websiteUrl || SAMPLE_REP.websiteUrl,
+    address: repForm.address || SAMPLE_REP.address,
+    calLink: repForm.calLink || SAMPLE_REP.calLink,
   };
-  const companyName = previewRep.role || data.companyName || "Company";
-  const websiteLabel = data.websiteLabel || data.websiteUrl;
-  const firstName = previewRep.name.split(" ")[0];
-  const previewFormBody = fillTemplate(data.formBody, {
-    firstName,
-    repName: previewRep.name,
-    companyName,
-  });
-  const previewSuccessBody = fillTemplate(data.successBody, {
-    firstName,
-    repName: previewRep.name,
-    companyName,
-  });
 
   return (
     <AdminShell>
-      <div className="p-8" style={{ maxWidth: "1100px" }}>
+      <div className="p-8" style={{ maxWidth: "1280px" }}>
         <div
           style={{
             display: "flex",
@@ -248,7 +258,7 @@ export default function RepLandingEditorPage() {
               Edit the shared copy and branding used across every <code className="text-orange-400">/r/[repId]</code> landing page.
             </p>
             <p className="text-slate-500 text-xs mt-2">
-              Each rep still keeps their own name, title, phone, email, company, and booking link.
+              Each rep keeps their own business card details, and the preview updates with the selected rep.
             </p>
           </div>
 
@@ -281,12 +291,12 @@ export default function RepLandingEditorPage() {
         {loading ? (
           <div className="text-slate-400 text-sm">Loading...</div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_500px] gap-6">
             <div className="flex flex-col gap-5">
               <div className="card">
                 <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                   <h3 className="text-white font-semibold" style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8" }}>
-                    Rep Info
+                    Rep Business Card
                   </h3>
                   <button onClick={handleSaveRep} disabled={repSaving || loading || !selectedRepId} className="btn-primary text-xs py-1.5 px-3">
                     {repSaving ? "Saving..." : repSaved ? "Saved!" : "Save Rep Info"}
@@ -294,15 +304,11 @@ export default function RepLandingEditorPage() {
                 </div>
 
                 <label className="label">Rep slot</label>
-                <select
-                  className="input"
-                  value={selectedRepId || ""}
-                  onChange={(e) => handleRepSelection(Number(e.target.value))}
-                >
+                <select className="input" value={selectedRepId || ""} onChange={(e) => handleRepSelection(Number(e.target.value))}>
                   {!selectedRepId && <option value="">Select a rep</option>}
                   {reps.map((rep) => (
                     <option key={rep.id} value={rep.id}>
-                      #{rep.id} · {rep.name} {rep.isActive ? "(active)" : "(inactive)"}
+                      #{rep.id} | {rep.name} {rep.isActive ? "(active)" : "(inactive)"}
                     </option>
                   ))}
                 </select>
@@ -318,24 +324,58 @@ export default function RepLandingEditorPage() {
                   </div>
                 </div>
 
-                <label className="label mt-3">Role</label>
-                <input className="input" value={repForm.role} onChange={(e) => updateRepField("role", e.target.value)} placeholder="AMRG Exteriors" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className="label">Company</label>
+                    <input className="input" value={repForm.company} onChange={(e) => updateRepField("company", e.target.value)} placeholder="AMRG Exteriors" />
+                  </div>
+                  <div>
+                    <label className="label">Headshot image URL</label>
+                    <input className="input" type="url" value={repForm.photoUrl} onChange={(e) => updateRepField("photoUrl", e.target.value)} placeholder="https://..." />
+                  </div>
+                </div>
+
+                <label className="label mt-3">Bio / Tagline</label>
+                <textarea className="input" rows={3} value={repForm.bio} onChange={(e) => updateRepField("bio", e.target.value)} placeholder="Short personal intro or trust-building line." />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                   <div>
-                    <label className="label">Phone</label>
+                    <label className="label">Mobile phone</label>
                     <input className="input" value={repForm.phone} onChange={(e) => updateRepField("phone", e.target.value)} placeholder="(555) 555-5555" />
                   </div>
+                  <div>
+                    <label className="label">Office phone</label>
+                    <input className="input" value={repForm.officePhone} onChange={(e) => updateRepField("officePhone", e.target.value)} placeholder="(952) 555-5555" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                   <div>
                     <label className="label">Email</label>
                     <input className="input" type="email" value={repForm.email} onChange={(e) => updateRepField("email", e.target.value)} placeholder="name@company.com" />
                   </div>
+                  <div>
+                    <label className="label">Booking link</label>
+                    <input className="input" type="url" value={repForm.calLink} onChange={(e) => updateRepField("calLink", e.target.value)} placeholder="https://calendly.com/..." />
+                  </div>
                 </div>
 
-                <label className="label mt-3">Headshot image URL</label>
-                <input className="input" type="url" value={repForm.photoUrl} onChange={(e) => updateRepField("photoUrl", e.target.value)} placeholder="https://... (SharePoint URL)" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className="label">Website label</label>
+                    <input className="input" value={repForm.websiteLabel} onChange={(e) => updateRepField("websiteLabel", e.target.value)} placeholder="www.company.com" />
+                  </div>
+                  <div>
+                    <label className="label">Website URL</label>
+                    <input className="input" type="url" value={repForm.websiteUrl} onChange={(e) => updateRepField("websiteUrl", e.target.value)} placeholder="https://www.company.com" />
+                  </div>
+                </div>
+
+                <label className="label mt-3">Office address</label>
+                <textarea className="input" rows={3} value={repForm.address} onChange={(e) => updateRepField("address", e.target.value)} placeholder={"10201 Wayzata Blvd #130\nMinnetonka, MN 55305"} />
+
                 <p className="text-slate-500 text-xs mt-2">
-                  This fills each rep's own landing page while the sections below stay reusable as the shared blank template.
+                  This fills each rep&apos;s business card while the sections below stay reusable as the shared template.
                 </p>
               </div>
 
@@ -349,9 +389,9 @@ export default function RepLandingEditorPage() {
                 <input className="input" type="url" value={data.logoUrl} onChange={(e) => update("logoUrl", e.target.value)} placeholder="https://..." />
                 <label className="label mt-3">Service line</label>
                 <input className="input" value={data.serviceLine} onChange={(e) => update("serviceLine", e.target.value)} placeholder="Roofing | Siding | Windows" />
-                <label className="label mt-3">Website label</label>
+                <label className="label mt-3">Default website label</label>
                 <input className="input" value={data.websiteLabel} onChange={(e) => update("websiteLabel", e.target.value)} placeholder="www.mcgeerestoration.com" />
-                <label className="label mt-3">Website URL</label>
+                <label className="label mt-3">Default website URL</label>
                 <input className="input" type="url" value={data.websiteUrl} onChange={(e) => update("websiteUrl", e.target.value)} placeholder="https://www.mcgeerestoration.com" />
               </div>
 
@@ -400,97 +440,26 @@ export default function RepLandingEditorPage() {
             </div>
 
             <div className="xl:sticky xl:top-20 self-start">
-              <div style={{ marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Preview
-                </span>
-                <span style={{ fontSize: "11px", color: "#475569" }}>(sample rep data)</span>
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div>
+                  <p className="text-slate-400 text-xs uppercase tracking-[0.18em]">Preview</p>
+                  <p className="text-slate-500 text-xs mt-1">Shared template plus the selected rep&apos;s business card details.</p>
+                </div>
+                {selectedRepId ? (
+                  <a href={`/r/${selectedRepId}`} target="_blank" rel="noopener noreferrer" className="btn-secondary text-xs">
+                    Open live page
+                  </a>
+                ) : null}
               </div>
 
-              <div
-                style={{
-                  background: "linear-gradient(180deg, #090909 0%, #0f1014 100%)",
-                  borderRadius: "20px",
-                  padding: "24px",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "20px" }}>
-                  <div>
-                    <div style={{ color: "#fbbf24", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>
-                      {companyName}
-                    </div>
-                    <div style={{ color: "white", fontSize: "20px", fontWeight: 800, marginTop: "6px" }}>{previewRep.name}</div>
-                    <div style={{ color: "#f59e0b", fontSize: "13px", marginTop: "6px" }}>{previewRep.title}</div>
-                  </div>
-                  <div style={{ width: "72px", height: "72px", borderRadius: "18px", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", display: "grid", placeItems: "center", color: "#fbbf24", fontSize: "28px", overflow: "hidden" }}>
-                    {previewRep.photoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={previewRep.photoUrl} alt={previewRep.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    ) : data.logoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={data.logoUrl} alt={companyName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    ) : (
-                      <span>{companyName.charAt(0)}</span>
-                    )}
-                  </div>
-                </div>
-
-                {data.badge && (
-                  <div style={{ display: "inline-flex", padding: "8px 12px", borderRadius: "999px", border: "1px solid rgba(245,158,11,0.24)", background: "rgba(245,158,11,0.08)", color: "#fbbf24", fontSize: "12px", fontWeight: 700, marginBottom: "16px" }}>
-                    {data.badge}
-                  </div>
-                )}
-
-                <div style={{ color: "white", fontSize: "24px", fontWeight: 800, lineHeight: 1.1, marginBottom: "12px" }}>{data.headline}</div>
-                <p style={{ color: "#cbd5e1", fontSize: "14px", lineHeight: 1.7, margin: 0 }}>{data.intro}</p>
-
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "20px" }}>
-                  <div style={{ background: "linear-gradient(135deg, #f59e0b, #fbbf24)", color: "#111827", padding: "10px 16px", borderRadius: "12px", fontSize: "13px", fontWeight: 800 }}>
-                    {data.primaryCtaText}
-                  </div>
-                  <div style={{ background: "rgba(255,255,255,0.04)", color: "white", padding: "10px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", fontSize: "13px", fontWeight: 700 }}>
-                    Text {firstName}
-                  </div>
-                </div>
-
-                {data.microNote && (
-                  <div style={{ marginTop: "14px", color: "#fcd34d", fontSize: "13px", fontWeight: 600 }}>{data.microNote}</div>
-                )}
-
-                <div style={{ marginTop: "18px", display: "grid", gap: "8px", color: "#cbd5e1", fontSize: "13px" }}>
-                  <div>{previewRep.phone}</div>
-                  <div>{previewRep.email}</div>
-                  <div>{websiteLabel}</div>
-                </div>
-
-                {data.serviceLine && (
-                  <div style={{ marginTop: "18px", color: "#fcd34d", fontSize: "13px", fontWeight: 700 }}>{data.serviceLine}</div>
-                )}
-
-                <div style={{ marginTop: "22px", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "18px" }}>
-                  <div style={{ color: "white", fontSize: "18px", fontWeight: 700, marginBottom: "8px" }}>{data.ctaHeading}</div>
-                  <p style={{ color: "#cbd5e1", fontSize: "13px", lineHeight: 1.7, margin: 0 }}>{data.ctaBody}</p>
-                </div>
-
-                <div style={{ marginTop: "22px", borderRadius: "14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
-                  <div style={{ color: "white", fontSize: "16px", fontWeight: 700, marginBottom: "8px" }}>{data.formHeading}</div>
-                  <p style={{ color: "#94a3b8", fontSize: "13px", lineHeight: 1.6, margin: 0 }}>{previewFormBody}</p>
-                </div>
-
-                <div style={{ marginTop: "16px", borderRadius: "14px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.18)", padding: "16px" }}>
-                  <div style={{ color: "white", fontSize: "16px", fontWeight: 700, marginBottom: "8px" }}>{data.successHeading}</div>
-                  <p style={{ color: "#cbd5e1", fontSize: "13px", lineHeight: 1.6, margin: 0 }}>{previewSuccessBody}</p>
-                </div>
-              </div>
+              <RepLandingExperience rep={previewRep} template={data} previewMode />
 
               <div style={{ marginTop: "16px", padding: "14px 16px", borderRadius: "10px", background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)" }}>
                 <p style={{ color: "#fb923c", fontSize: "12px", fontWeight: 600, marginBottom: "4px" }}>
                   Shared template behavior
                 </p>
                 <p style={{ color: "#94a3b8", fontSize: "12px", lineHeight: 1.6 }}>
-                  Every rep page uses this template, then fills in that rep's own info. Use the Reps page when you want to change who the page belongs to.
+                  Every rep page uses this template, then fills in the selected rep&apos;s own business card info. Use the Reps page for slot activation and tag assignment.
                 </p>
               </div>
             </div>

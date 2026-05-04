@@ -74,9 +74,13 @@ export async function POST(req: NextRequest) {
     !!existing &&
     existing.name === `Rep ${repId}` &&
     !existing.phone &&
+    !existing.officePhone &&
     !existing.email &&
     !existing.bio &&
     !existing.photoUrl &&
+    !existing.websiteLabel &&
+    !existing.websiteUrl &&
+    !existing.address &&
     !existing.calLink &&
     !existing.redirectUrl &&
     !existing.isActive;
@@ -91,11 +95,15 @@ export async function POST(req: NextRequest) {
   const data = {
     name,
     phone: body.phone ? String(body.phone) : undefined,
+    officePhone: body.officePhone ? String(body.officePhone) : undefined,
     email: body.email ? String(body.email) : undefined,
     title: body.title ? String(body.title) : existing?.title || undefined,
     company: body.company ? String(body.company) : existing?.company || undefined,
     bio: body.bio ? String(body.bio) : undefined,
     photoUrl: body.photoUrl ? String(body.photoUrl) : undefined,
+    websiteLabel: body.websiteLabel ? String(body.websiteLabel) : undefined,
+    websiteUrl: body.websiteUrl ? String(body.websiteUrl) : undefined,
+    address: body.address ? String(body.address) : undefined,
     calLink: body.calLink ? String(body.calLink) : undefined,
     isActive: true,
   };
