@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMRG Exteriors | Tap Card</title>
+  <style>
+    :root {
+      --bg: #0a0a0c; --panel: #111216; --panel-2: #17191f;
+      --text: #f3f5f7; --muted: #b7bcc7;
+      --accent: #f5a300; --accent-2: #ffbf3c;
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 20px 60px rgba(0,0,0,0.45);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(245,163,0,0.14), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(255,191,60,0.08), transparent 22%),
+        linear-gradient(180deg, #090909 0%, #0f1014 100%);
+      color: var(--text);
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(9,9,11,0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; letter-spacing: 0.06em; }
+    .brand-mark {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: linear-gradient(145deg, rgba(245,163,0,0.22), rgba(245,163,0,0.06));
+      border: 1px solid rgba(245,163,0,0.4);
+      display: grid; place-items: center; color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+      font-size: 1.15rem; overflow: hidden;
+    }
+    .brand-copy small { display: block; color: var(--accent); font-size: 0.72rem; letter-spacing: 0.18em; margin-bottom: 3px; }
+    .brand-copy span { display: block; font-size: 1rem; }
+    .nav-links { display: flex; gap: 22px; color: var(--muted); font-size: 0.95rem; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      padding: 12px 18px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #151515; font-weight: 800;
+      box-shadow: 0 10px 30px rgba(245,163,0,0.24);
+    }
+    .hero { padding: 56px 0 48px; }
+    .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 42px; align-items: center; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-radius: 999px;
+      background: rgba(245,163,0,0.08); border: 1px solid rgba(245,163,0,0.22);
+      color: var(--accent-2); font-size: 0.82rem; letter-spacing: 0.12em;
+      text-transform: uppercase; margin-bottom: 18px;
+    }
+    h1 { margin: 0 0 18px; font-size: clamp(2.5rem,5vw,4.5rem); line-height: 0.97; letter-spacing: -0.04em; }
+    .accent { color: var(--accent); }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.06rem; line-height: 1.75; max-width: 620px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 22px; border-radius: 16px; font-weight: 800; transition: 0.2s ease; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #141414; box-shadow: 0 16px 34px rgba(245,163,0,0.22); }
+    .btn-secondary { border: 1px solid rgba(255,255,255,0.09); background: rgba(255,255,255,0.03); color: var(--text); }
+    .btn:hover { transform: translateY(-2px); }
+    .contact-strip { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 18px; color: var(--muted); font-size: 0.95rem; }
+    .contact-strip span { display: inline-flex; align-items: center; gap: 8px; }
+    .micro-note { margin-top: 14px; color: var(--accent-2); font-size: 0.92rem; font-weight: 600; }
+    .mockup-wrap { position: relative; padding: 24px; display: flex; justify-content: center; }
+    .card-glow { position: absolute; inset: 12% 14%; background: radial-gradient(circle, rgba(245,163,0,0.20), transparent 62%); filter: blur(28px); z-index: 0; }
+    .tap-card {
+      position: relative; z-index: 1; width: min(100%, 510px); aspect-ratio: 1.72/1;
+      border-radius: 24px; overflow: hidden;
+      background: radial-gradient(circle at 30% 55%, rgba(255,255,255,0.08), transparent 22%), linear-gradient(145deg,#222329 0%,#0d0e12 52%,#14151a 100%);
+      border: 1px solid rgba(255,255,255,0.08); box-shadow: var(--shadow);
+      padding: 24px; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 18px; isolation: isolate;
+    }
+    .tap-card::before {
+      content: ""; position: absolute; left: -5%; right: -5%; bottom: 12px; height: 6px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent) 22%, var(--accent-2) 50%, var(--accent) 78%, transparent 100%);
+      opacity: 0.95;
+    }
+    .tap-card::after {
+      content: ""; position: absolute; left: 0; bottom: 22px; width: 46%; height: 56px;
+      background: linear-gradient(145deg, transparent 0 14%, var(--accent) 14% 16%, #d6dbe0 16% 27%, #eff2f5 27% 36%, transparent 36%);
+      opacity: 0.95;
+      clip-path: polygon(0 100%, 0 62%, 58% 62%, 66% 28%, 100% 28%, 100% 100%);
+    }
+    .info h2 { margin: 0; font-size: clamp(1.7rem,3vw,2.25rem); line-height: 1; }
+    .role { margin-top: 10px; color: var(--accent-2); font-weight: 700; font-size: 0.96rem; }
+    .details { margin-top: 24px; display: grid; gap: 11px; color: #edf1f5; font-size: 0.92rem; }
+    .details div { display: flex; align-items: flex-start; gap: 10px; line-height: 1.45; position: relative; }
+    .details div:last-child span { position: relative; z-index: 1; }
+    .details div:last-child span::before {
+      content: ""; position: absolute; left: -6px; right: -6px; bottom: 4px; height: 6px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent) 25%, var(--accent-2) 50%, var(--accent) 75%, transparent 100%);
+      z-index: -1; opacity: 0.9;
+    }
+    .dot {
+      width: 24px; height: 24px; min-width: 24px; border-radius: 999px;
+      background: rgba(245,163,0,0.14); border: 1px solid rgba(245,163,0,0.32);
+      color: var(--accent); display: grid; place-items: center; font-size: 0.76rem; margin-top: 1px;
+    }
+    .logo-side { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-left: 8px; gap: 10px; }
+    .headshot-wrap {
+      width: 82px; height: 82px; border-radius: 50%; overflow: hidden;
+      border: 2px solid rgba(245,163,0,0.5);
+      box-shadow: 0 0 0 4px rgba(245,163,0,0.1), 0 8px 24px rgba(0,0,0,0.4);
+      background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .headshot-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .headshot-placeholder { font-size: 2rem; opacity: 0.35; line-height: 1; }
+    .logo-img { width: 110px; height: auto; filter: drop-shadow(0 10px 25px rgba(245,163,0,0.25)); }
+    .tagline { color: var(--accent-2); font-weight: 700; font-size: 0.85rem; }
+    section { padding: 34px 0; }
+    .cta-block {
+      margin: 40px 0 60px;
+      background: radial-gradient(circle at top right, rgba(245,163,0,0.18), transparent 28%), linear-gradient(135deg,#15171b 0%,#0d0f13 100%);
+      border: 1px solid rgba(245,163,0,0.16); border-radius: 32px; padding: 34px;
+      box-shadow: var(--shadow); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px;
+    }
+    .cta-block h3 { margin: 0 0 8px; font-size: clamp(1.7rem,3vw,2.6rem); }
+    .cta-block p { margin: 0; color: var(--muted); line-height: 1.7; max-width: 680px; }
+    footer { padding: 0 0 42px; color: #8d94a0; font-size: 0.92rem; }
+    /* Settings */
+    .settings-btn {
+      position: fixed; bottom: 20px; right: 20px; width: 44px; height: 44px;
+      border-radius: 50%; background: rgba(245,163,0,0.15); border: 1px solid rgba(245,163,0,0.35);
+      color: var(--accent); font-size: 1.2rem; cursor: pointer; display: grid; place-items: center;
+      z-index: 100; transition: background 0.2s;
+    }
+    .settings-btn:hover { background: rgba(245,163,0,0.28); }
+    .settings-panel {
+      display: none; position: fixed; bottom: 74px; right: 20px; width: 300px;
+      background: #1a1c22; border: 1px solid rgba(245,163,0,0.25);
+      border-radius: 18px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.55); z-index: 100;
+    }
+    .settings-panel.open { display: block; }
+    .settings-panel h4 { margin: 0 0 14px; font-size: 0.9rem; color: var(--accent-2); letter-spacing: 0.08em; text-transform: uppercase; }
+    .settings-panel label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 6px; }
+    .settings-panel input[type="text"] {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+      color: var(--text); font-size: 0.85rem; outline: none; box-sizing: border-box;
+    }
+    .settings-panel input:focus { border-color: rgba(245,163,0,0.45); }
+    .settings-save {
+      margin-top: 12px; width: 100%; padding: 10px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #141414; font-weight: 800; font-size: 0.9rem; cursor: pointer;
+    }
+    .settings-save:hover { opacity: 0.88; }
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .tap-card { max-width: 560px; }
+    }
+    @media (max-width: 720px) {
+      .nav-links { display: none; }
+      .hero { padding-top: 34px; }
+      .tap-card { grid-template-columns: 1fr; aspect-ratio: auto; padding-bottom: 86px; }
+      .logo-side { padding-left: 0; margin-top: 8px; }
+      .contact-strip { flex-direction: column; gap: 10px; }
+      .cta-block { padding: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav">
+      <a href="#top" class="brand">
+        <div class="brand-mark">
+          <img src="rep-landing-logo.svg" alt="AMRG Logo" style="width:28px;height:auto;" />
+        </div>
+        <div class="brand-copy">
+          <small>AMRG EXTERIORS</small>
+          <span>Tap Card Landing Page</span>
+        </div>
+      </a>
+      <a class="nav-cta" href="tel:6125137534">Call Now</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Good meeting you</div>
+          <h1>Good meeting you — <span class="accent">don't wait too long to take a look</span>.</h1>
+          <p>Storm damage isn't always obvious right away. It's worth taking a look sooner rather than later — this makes it easy to get started.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="tel:6125137534">Call Eric</a>
+            <a class="btn btn-secondary" href="sms:6125137534?body=Hi%20Eric%2C%20this%20is%20%5Byour%20name%5D.%20I%20wanted%20to%20follow%20up%20about%20my%20home.">Text Eric</a>
+            <a class="btn btn-secondary" href="eric-swanberg.vcf" download>Save Contact</a>
+            <a class="btn btn-primary" href="https://www.mcgeerestoration.com" target="_blank" rel="noopener">Start My Inspection</a>
+          </div>
+          <div class="micro-note">Fastest next step: send a quick text and I'll take it from there.</div>
+          <div class="contact-strip">
+            <span>📱 (612) 513-7534</span>
+            <span>☎ (952) 426-3736</span>
+            <span>📍 Minnetonka, MN</span>
+          </div>
+        </div>
+
+        <div class="mockup-wrap">
+          <div class="card-glow"></div>
+          <div class="tap-card">
+            <div class="info">
+              <h2>Eric Swanberg</h2>
+              <div class="role">Exterior Renovation Consultant</div>
+              <div class="details">
+                <div><span class="dot">☎</span><span>M: (612) 513-7534<br>O: (952) 426-3736</span></div>
+                <div><span class="dot">✉</span><span>ericswanberg@mcgeerestoration.com</span></div>
+                <div><span class="dot">🌐</span><span>www.mcgeerestoration.com</span></div>
+                <div><span class="dot">📍</span><span>10201 Wayzata Blvd #130<br>Minnetonka, MN 55305</span></div>
+              </div>
+            </div>
+            <div class="logo-side">
+              <div class="headshot-wrap">
+                <span class="headshot-placeholder" id="headshotPlaceholder">👤</span>
+                <img id="headshotImg" src="" alt="Eric Swanberg" style="display:none;" />
+              </div>
+              <img src="rep-landing-logo.svg" alt="AMRG Exteriors Logo" class="logo-img" />
+              <div class="tagline">Roofing | Siding | Windows</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="cta-block" id="contact">
+        <div>
+          <h3>The sooner we check it, the better.</h3>
+          <p>We'll take a look, document anything we find, and walk you through your options — including insurance if it applies.</p>
+        </div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="tel:6125137534">Call Eric</a>
+          <a class="btn btn-secondary" href="sms:6125137534?body=Hi%20Eric%2C%20this%20is%20%5Byour%20name%5D.%20I%20wanted%20to%20follow%20up%20about%20my%20home.">Text Eric</a>
+          <a class="btn btn-secondary" href="eric-swanberg.vcf" download>Save Contact</a>
+          <a class="btn btn-secondary" href="https://www.mcgeerestoration.com" target="_blank" rel="noopener">Visit Website</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">AMRG Exteriors • Eric Swanberg • Exterior Renovation Consultant</div>
+  </footer>
+
+  <button class="settings-btn" id="settingsToggle" title="Card Settings">⚙️</button>
+  <div class="settings-panel" id="settingsPanel">
+    <h4>Card Settings</h4>
+    <label for="headshotInput">Headshot Photo URL</label>
+    <input type="text" id="headshotInput" placeholder="https://example.com/your-photo.jpg" />
+    <button class="settings-save" id="settingsSave">Save Photo</button>
+  </div>
+
+  <script>
+    // VCF download
+    const vcfContent = `BEGIN:VCARD\nVERSION:3.0\nFN:Eric Swanberg\nN:Swanberg;Eric;;;\nORG:AMRG Exteriors\nTITLE:Exterior Renovation Consultant\nTEL;TYPE=CELL:(612) 513-7534\nTEL;TYPE=WORK:(952) 426-3736\nEMAIL:ericswanberg@mcgeerestoration.com\nURL:https://www.mcgeerestoration.com\nADR;TYPE=WORK:;;10201 Wayzata Blvd #130;Minnetonka;MN;55305;USA\nEND:VCARD`;
+    const blob = new Blob([vcfContent], { type: 'text/vcard;charset=utf-8' });
+    const vcfUrl = URL.createObjectURL(blob);
+    document.querySelectorAll('a[href="eric-swanberg.vcf"]').forEach(link => {
+      link.href = vcfUrl;
+      link.setAttribute('download', 'Eric-Swanberg.vcf');
+    });
+
+    // Headshot — persists via localStorage
+    const headshotImg         = document.getElementById('headshotImg');
+    const headshotPlaceholder = document.getElementById('headshotPlaceholder');
+    const headshotInput       = document.getElementById('headshotInput');
+    const settingsToggle      = document.getElementById('settingsToggle');
+    const settingsPanel       = document.getElementById('settingsPanel');
+
+    function applyHeadshot(url) {
+      if (url && url.trim()) {
+        headshotImg.src = url.trim();
+        headshotImg.style.display = 'block';
+        headshotPlaceholder.style.display = 'none';
+        headshotImg.onerror = function() {
+          headshotImg.style.display = 'none';
+          headshotPlaceholder.style.display = 'block';
+        };
+      } else {
+        headshotImg.style.display = 'none';
+        headshotPlaceholder.style.display = 'block';
+      }
+    }
+
+    var savedUrl = localStorage.getItem('headshotUrl') || '';
+    headshotInput.value = savedUrl;
+    applyHeadshot(savedUrl);
+
+    settingsToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      settingsPanel.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!settingsPanel.contains(e.target) && e.target !== settingsToggle) {
+        settingsPanel.classList.remove('open');
+      }
+    });
+
+    document.getElementById('settingsSave').addEventListener('click', function() {
+      var url = headshotInput.value.trim();
+      localStorage.setItem('headshotUrl', url);
+      applyHeadshot(url);
+      settingsPanel.classList.remove('open');
+    });
+
+    headshotInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('settingsSave').click();
+    });
+  </script>
+</body>
+</html>
