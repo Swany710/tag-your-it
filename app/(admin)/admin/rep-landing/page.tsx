@@ -26,6 +26,13 @@ const SAMPLE_REP: RepLandingRep = {
   calLink: "",
 };
 
+type DocOption = {
+  id: string;
+  name: string;
+  filename: string;
+  sizeBytes: number;
+};
+
 type RepOption = {
   id: number;
   name: string;
@@ -78,6 +85,7 @@ function toRepForm(rep?: Partial<RepOption> | null): RepForm {
 export default function RepLandingEditorPage() {
   const [data, setData] = useState<RepLandingTemplateData>(DEFAULT_REP_LANDING_TEMPLATE);
   const [reps, setReps] = useState<RepOption[]>([]);
+  const [docs, setDocs] = useState<DocOption[]>([]);
   const [selectedRepId, setSelectedRepId] = useState<number>(0);
   const [repForm, setRepForm] = useState<RepForm>(toRepForm(null));
   const [loading, setLoading] = useState(true);
@@ -92,14 +100,20 @@ export default function RepLandingEditorPage() {
     Promise.all([
       fetch("/api/rep-landing-page").then((r) => r.json()),
       fetch("/api/reps").then((r) => r.json()).catch(() => ({ reps: [] })),
+      fetch("/api/documents").then((r) => r.json()).catch(() => ({ documents: [] })),
     ])
-      .then(([templatePayload, repsPayload]) => {
+      .then(([templatePayload, repsPayload, docsPayload]) => {
         setData(normalizeRepLandingTemplate(templatePayload?.page));
 
         const loadedReps = Array.isArray(repsPayload?.reps)
           ? (repsPayload.reps as RepOption[])
           : [];
         setReps(loadedReps);
+
+        const loadedDocs = Array.isArray(docsPayload?.documents)
+          ? (docsPayload.documents as DocOption[])
+          : [];
+        setDocs(loadedDocs);
 
         const initialRep = loadedReps.find((rep) => rep.isActive) ?? loadedReps[0];
         if (initialRep) {
@@ -436,6 +450,39 @@ export default function RepLandingEditorPage() {
                 <input className="input" value={data.successHeading} onChange={(e) => update("successHeading", e.target.value)} />
                 <label className="label mt-3">Success body</label>
                 <textarea className="input" rows={3} value={data.successBody} onChange={(e) => update("successBody", e.target.value)} style={{ resize: "vertical" }} />
+              </div>
+
+              <div className="card">
+                <h3 className="text-white font-semibold mb-4" style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8" }}>
+                  📚 Referral Book
+                </h3>
+                <label className="label">Attach a referral book PDF</label>
+                <select
+                  className="input"
+                  value={data.referralBookDocId || ""}
+                  onChange={(e) => update("referralBookDocId", e.target.value)}
+                >
+                  <option value="">None — don&apos;t show on landing page</option>
+                  {docs.map((doc) => (
+                    <option key={doc.id} value={doc.id}>
+                      {doc.name} ({doc.filename})
+                    </option>
+                  ))}
+                </select>
+                <p className="text-slate-500 text-xs mt-2">
+                  When set, a &quot;📖 Referral Book&quot; button appears on every rep landing page.
+                  Upload PDFs in the <strong>Referral Book</strong> admin section.
+                </p>
+                {data.referralBookDocId && (
+                  <a
+                    href={`/api/documents/${data.referralBookDocId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary text-sm mt-3 inline-block"
+                  >
+                    Preview selected PDF ↗
+                  </a>
+                )}
               </div>
             </div>
 

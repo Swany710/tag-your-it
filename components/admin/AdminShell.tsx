@@ -14,7 +14,7 @@ const NAV = [
   { href: "/admin/tags", label: "Tags", icon: "🏷️" },
   { href: "/admin/deals", label: "Deals", icon: "🎯" },
   { href: "/admin/jobs", label: "Jobs", icon: "🏠" },
-  { href: "/admin/documents", label: "Documents", icon: "📄" },
+  { href: "/admin/referral-book", label: "Referral Book", icon: "📚" },
 ];
 
 function AdminShellContent({ children }: { children: React.ReactNode }) {
@@ -58,14 +58,14 @@ function AdminShellContent({ children }: { children: React.ReactNode }) {
 
             <div className="w-px h-6 bg-stone-300 flex-shrink-0" />
 
-            <nav className="flex items-center gap-1 flex-1 overflow-x-auto">
+            <nav className="flex items-center gap-1.5 flex-1 overflow-x-auto justify-center">
               {NAV.map((item) => {
                 const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap border transition-colors ${active ? "bg-orange-500 border-orange-500 text-white shadow" : "bg-stone-100 border-stone-300 text-stone-800 hover:bg-stone-200 hover:border-stone-400"}`}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap border-2 transition-all shadow-sm ${active ? "bg-orange-500 border-orange-500 text-white shadow-md" : "bg-white border-stone-300 text-stone-800 hover:bg-stone-50 hover:border-orange-400 hover:shadow"}`}
                   >
                     <span>{item.icon}</span>
                     <span>{item.label}</span>

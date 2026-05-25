@@ -156,8 +156,9 @@ model RepLandingPage {
   formBody       String   @default("Tell us a little about your property and {{firstName}} will get back to you fast.")
   successHeading String   @default("Request received. You're in good hands.")
   successBody    String   @default("{{repName}} will follow up shortly to schedule your free inspection and walk you through the next steps.")
-  logoUrl        String?
-  updatedAt      DateTime @updatedAt
+  logoUrl           String?
+  referralBookDocId String?  // Document.id to show as "Referral Book" on landing pages
+  updatedAt         DateTime @updatedAt
 }
 
 // ---------------- Job completions -------------------------

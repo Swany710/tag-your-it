@@ -709,6 +709,23 @@ export default function RepLandingExperience({
                   Save Contact
                 </button>
 
+                {template.referralBookDocId && (
+                  previewMode ? (
+                    <button type="button" className="rli-btn rli-btn-secondary">
+                      📖 Referral Book
+                    </button>
+                  ) : (
+                    <a
+                      className="rli-btn rli-btn-secondary"
+                      href={`/api/documents/${template.referralBookDocId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      📖 Referral Book
+                    </a>
+                  )
+                )}
+
                 {rep.calLink && !previewMode ? (
                   <a className="rli-btn rli-btn-primary" href={rep.calLink} target="_blank" rel="noopener noreferrer">
                     {template.primaryCtaText}

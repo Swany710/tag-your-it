@@ -15,10 +15,12 @@ export type RepLandingTemplateData = {
   successHeading: string;
   successBody: string;
   logoUrl: string;
+  referralBookDocId: string; // document ID from the referral book; empty = not shown
 };
 
-type RepLandingTemplateInput = Omit<Partial<RepLandingTemplateData>, "logoUrl"> & {
+type RepLandingTemplateInput = Omit<Partial<RepLandingTemplateData>, "logoUrl" | "referralBookDocId"> & {
   logoUrl?: string | null;
+  referralBookDocId?: string | null;
 };
 
 export const DEFAULT_REP_LANDING_TEMPLATE: RepLandingTemplateData = {
@@ -42,6 +44,7 @@ export const DEFAULT_REP_LANDING_TEMPLATE: RepLandingTemplateData = {
   successBody:
     "{{repName}} will follow up shortly to schedule your free inspection and walk you through the next steps.",
   logoUrl: "/rep-landing-logo.svg",
+  referralBookDocId: "",
 };
 
 export function normalizeRepLandingTemplate(
@@ -71,5 +74,6 @@ export function normalizeRepLandingTemplate(
       merged.successHeading?.trim() || DEFAULT_REP_LANDING_TEMPLATE.successHeading,
     successBody: merged.successBody?.trim() || DEFAULT_REP_LANDING_TEMPLATE.successBody,
     logoUrl: merged.logoUrl?.trim() || DEFAULT_REP_LANDING_TEMPLATE.logoUrl,
+    referralBookDocId: merged.referralBookDocId?.trim() || "",
   };
 }
