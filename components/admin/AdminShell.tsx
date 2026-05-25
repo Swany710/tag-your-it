@@ -46,7 +46,7 @@ function AdminShellContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-900">
-      <header className="bg-slate-950 border-b border-slate-800 sticky top-0 z-50">
+      <header className="bg-slate-900 border-b border-slate-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 h-16">
             <Link href="/admin" className="flex items-center gap-2 flex-shrink-0 mr-2">
@@ -56,7 +56,7 @@ function AdminShellContent({ children }: { children: React.ReactNode }) {
               <span className="text-white font-semibold text-sm hidden sm:block">Tap System</span>
             </Link>
 
-            <div className="w-px h-6 bg-slate-800 flex-shrink-0" />
+            <div className="w-px h-6 bg-slate-600 flex-shrink-0" />
 
             <nav className="flex items-center gap-1 flex-1 overflow-x-auto">
               {NAV.map((item) => {
@@ -65,9 +65,7 @@ function AdminShellContent({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                      active ? "bg-orange-500/15 text-orange-400" : "text-slate-400 hover:text-white hover:bg-slate-800"
-                    }`}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap border transition-colors ${active ? "bg-orange-500 border-orange-500 text-white shadow" : "bg-slate-700 border-slate-500 text-white hover:bg-slate-600 hover:border-slate-400"}`}
                   >
                     <span>{item.icon}</span>
                     <span>{item.label}</span>
@@ -77,12 +75,12 @@ function AdminShellContent({ children }: { children: React.ReactNode }) {
             </nav>
 
             <div className="flex items-center gap-3 flex-shrink-0 ml-auto">
-              <p className="text-slate-400 text-xs hidden md:block truncate max-w-[140px]">
+              <p className="text-slate-300 text-xs hidden md:block truncate max-w-[140px]">
                 {session.user?.email}
               </p>
               <button
                 onClick={() => signOut({ callbackUrl: "/admin/login" })}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-slate-400 hover:text-white text-sm rounded-lg hover:bg-slate-800 border border-slate-800 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-slate-200 hover:text-white text-sm rounded-lg hover:bg-slate-700 border border-slate-600 transition-colors"
               >
                 Sign out
               </button>
