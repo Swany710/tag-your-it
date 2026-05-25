@@ -200,17 +200,3 @@ model Document {
   uploadedAt  DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
-
-
-// ─── Documents (PDF storage) ─────────────────────────────────
-model Document {
-  id          String   @id @default(cuid())
-  name        String                        // display name, e.g. "Company Brochure"
-  description String?                       // optional note
-  filename    String                        // original file name from upload
-  mimeType    String   @default("application/pdf")
-  data        Bytes                         // raw file bytes stored in PostgreSQL
-  sizeBytes   Int
-  uploadedAt  DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
