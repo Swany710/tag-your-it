@@ -15,7 +15,7 @@ export async function GET(_req: Request, { params }: Ctx) {
     select: { data: true, mimeType: true, filename: true, sizeBytes: true },
   });
   if (!doc) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return new Response(doc.data, {
+  return new Response(new Uint8Array(doc.data), {
     headers: {
       "Content-Type": doc.mimeType,
       "Content-Length": doc.sizeBytes.toString(),
