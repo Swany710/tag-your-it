@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { SessionProvider, signOut, useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin/tags", label: "Tags", icon: "🏷️" },
   { href: "/admin/deals", label: "Deals", icon: "🎯" },
   { href: "/admin/jobs", label: "Jobs", icon: "🏠" },
+  { href: "/admin/documents", label: "Documents", icon: "📄" },
 ];
 
 function AdminShellContent({ children }: { children: React.ReactNode }) {
