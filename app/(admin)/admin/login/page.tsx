@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
@@ -38,14 +38,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500 mb-4 text-white text-2xl font-black">
             T
           </div>
-          <h1 className="text-2xl font-bold text-white">Tap System</h1>
-          <p className="text-slate-400 mt-1 text-sm">Admin Dashboard</p>
+          <h1 className="text-2xl font-bold text-stone-900">Tap System</h1>
+          <p className="text-stone-500 mt-1 text-sm">Admin Dashboard</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card space-y-4">
@@ -84,7 +84,7 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Sign In"}
           </button>
 
-          <p className="text-slate-500 text-xs text-center">
+          <p className="text-stone-400 text-xs text-center">
             Use the seeded admin email and the password stored in your Railway `ADMIN_PASSWORD` variable.
           </p>
         </form>
