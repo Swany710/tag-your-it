@@ -1,5 +1,8 @@
+[build]
+buildCommand = "npm run build"
+
 [deploy]
 preDeployCommand = "npm run db:setup"
 startCommand = "npm run start"
 healthcheckPath = "/api/healthz"
-healthcheckTimeout = 300
+healthcheckTimeout = 500
