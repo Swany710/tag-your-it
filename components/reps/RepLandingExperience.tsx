@@ -278,6 +278,11 @@ const css = `
     opacity: 0.95;
   }
 
+  .rli-card-info {
+    position: relative;
+    z-index: 1;
+  }
+
   .rli-card-info h2 {
     margin: 0;
     font-size: clamp(1.7rem, 3vw, 2.25rem);
@@ -344,6 +349,8 @@ const css = `
     justify-content: center;
     text-align: center;
     padding-left: 8px;
+    position: relative;
+    z-index: 1;
   }
 
   .rli-logo-img {

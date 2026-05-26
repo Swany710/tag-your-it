@@ -312,9 +312,18 @@ export default function RepLandingEditorPage() {
                   <h3 className="text-white font-semibold" style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8" }}>
                     Rep Business Card
                   </h3>
-                  <button onClick={handleSaveRep} disabled={repSaving || loading || !selectedRepId} className="btn-primary text-xs py-1.5 px-3">
-                    {repSaving ? "Saving..." : repSaved ? "Saved!" : "Save Rep Info"}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      className="btn-secondary text-xs py-1.5 px-3"
+                      onClick={() => setRepForm({ name: "", title: "", company: "", phone: "", officePhone: "", email: "", bio: "", photoUrl: "", websiteLabel: "", websiteUrl: "", address: "", calLink: "" })}
+                    >
+                      Clear All
+                    </button>
+                    <button onClick={handleSaveRep} disabled={repSaving || loading || !selectedRepId} className="btn-primary text-xs py-1.5 px-3">
+                      {repSaving ? "Saving..." : repSaved ? "Saved!" : "Save Rep Info"}
+                    </button>
+                  </div>
                 </div>
 
                 <label className="label">Rep slot</label>
