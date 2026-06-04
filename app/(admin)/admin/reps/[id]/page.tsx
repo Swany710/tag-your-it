@@ -59,11 +59,55 @@ export default function EditRepPage() {
     });
 
     if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.rep) setRep((current) => current ? { ...current, ...data.rep } : current);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } else {
       const data = await res.json().catch(() => ({}));
       setError(data.error ?? "Failed to save.");
+    }
+
+    setSaving(false);
+  }
+
+  async function handleClearAndReassign() {
+    if (!rep || !confirm("Clear all personal info from this slot? The NFC URL stays the same but all rep details will be wiped so you can assign it to someone new.")) return;
+
+    setSaving(true);
+    setError("");
+
+    const cleared = {
+      name: "Unassigned",
+      phone: null,
+      officePhone: null,
+      email: null,
+      title: null,
+      company: null,
+      bio: null,
+      photoUrl: null,
+      websiteLabel: null,
+      websiteUrl: null,
+      address: null,
+      calLink: null,
+      redirectUrl: null,
+      isActive: false,
+    };
+
+    const res = await fetch(`/api/reps/${rep.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cleared),
+    });
+
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.rep) setRep((current) => current ? { ...current, ...data.rep } : current);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Failed to clear rep.");
     }
 
     setSaving(false);
@@ -232,6 +276,9 @@ export default function EditRepPage() {
               <div className="flex gap-3 pt-1 flex-wrap">
                 <button type="submit" className="btn-primary" disabled={saving}>
                   {saving ? "Saving..." : "Save Changes"}
+                </button>
+                <button type="button" onClick={handleClearAndReassign} className="btn-secondary" disabled={saving}>
+                  Clear &amp; Reassign
                 </button>
                 <button type="button" onClick={handleDeactivate} className="btn-danger">
                   Deactivate
