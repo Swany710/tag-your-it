@@ -72,39 +72,19 @@ export default function EditRepPage() {
   }
 
   async function handleClearAndReassign() {
-    if (!rep || !confirm("Clear all personal info from this slot? The NFC URL stays the same but all rep details will be wiped so you can assign it to someone new.")) return;
+    if (!rep || !confirm("Clear all personal info from this slot? The NFC URL stays the same but all rep details will be wiped so you can assign it to someone new. Fill in the new rep's info and hit Save Changes when ready.")) return;
 
     setSaving(true);
     setError("");
 
-    const cleared = {
-      name: "Unassigned",
-      phone: null,
-      officePhone: null,
-      email: null,
-      title: null,
-      company: null,
-      bio: null,
-      photoUrl: null,
-      websiteLabel: null,
-      websiteUrl: null,
-      address: null,
-      calLink: null,
-      redirectUrl: null,
-      isActive: false,
-    };
-
-    const res = await fetch(`/api/reps/${rep.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(cleared),
-    });
+    // PUT does a guaranteed hard wipe of every personal field in one DB call
+    const res = await fetch(`/api/reps/${rep.id}`, { method: "PUT" });
 
     if (res.ok) {
       const data = await res.json().catch(() => ({}));
       if (data.rep) setRep((current) => current ? { ...current, ...data.rep } : current);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      setSuccess(false);
+      setError("");
     } else {
       const data = await res.json().catch(() => ({}));
       setError(data.error ?? "Failed to clear rep.");
@@ -310,3 +290,4 @@ export default function EditRepPage() {
     </AdminShell>
   );
 }
+                                                                                                                                                                                                                                                                                                                                             

@@ -5,6 +5,5 @@ const nextConfig = {
       { protocol: "https", hostname: "**" },
     ],
   },
-};
-
-module.exports = nextConfig;
+  async headers() {
+    return [
