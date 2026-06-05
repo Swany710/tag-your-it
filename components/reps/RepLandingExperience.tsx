@@ -927,4 +927,31 @@ export default function RepLandingExperience({
                 <div style={{ display: "inline-flex", gap: "12px", marginTop: "18px", flexWrap: "wrap", justifyContent: "center" }}>
                   {rep.phone &&
                     (previewMode ? (
-                      <butt
+                      <button type="button" className="rli-btn rli-btn-secondary">
+                        Call {rep.phone}
+                      </button>
+                    ) : (
+                      <a className="rli-btn rli-btn-secondary" href={`tel:${rep.phone}`}>
+                        Call {rep.phone}
+                      </a>
+                    ))}
+                  {previewMode && (
+                    <button type="button" className="rli-btn rli-btn-primary" onClick={() => setStep("profile")}>
+                      Back to preview
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+
+      <footer className="rli-footer">
+        <div className="rli-container">
+          {businessName} | {rep.name} | {roleLabel}
+        </div>
+      </footer>
+    </div>
+  );
+}

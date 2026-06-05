@@ -18,15 +18,26 @@ export default function RepsPage() {
   const [reps, setReps]       = useState<Rep[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter]   = useState<"all" | "active" | "inactive">("all");
+  const [clearing, setClearing] = useState(false);
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
-  useEffect(() => {
+  function loadReps() {
     fetch("/api/reps?stats=true")
       .then((r) => r.json())
       .then((d) => { setReps(d.reps ?? []); setLoading(false); })
       .catch(() => setLoading(false));
-  }, []);
+  }
+
+  useEffect(() => { loadReps(); }, []);
+
+  async function handleClearAll() {
+    if (!confirm("Clear ALL rep slots? Every rep's personal info will be wiped and all slots will go offline. This cannot be undone.")) return;
+    setClearing(true);
+    await fetch("/api/reps/clear-all", { method: "POST" });
+    await loadReps();
+    setClearing(false);
+  }
 
   const filtered = reps.filter((r) => {
     if (filter === "active")   return r.isActive;
@@ -49,7 +60,12 @@ export default function RepsPage() {
               {activeCount} active · {inactiveCount} unassigned · {reps.length} total slots
             </p>
           </div>
-          <Link href="/admin/reps/new" className="btn-primary">+ Add Rep</Link>
+          <div className="flex gap-2">
+            <button onClick={handleClearAll} disabled={clearing} className="btn-danger text-sm">
+              {clearing ? "Clearing..." : "Clear All Slots"}
+            </button>
+            <Link href="/admin/reps/new" className="btn-primary">+ Add Rep</Link>
+          </div>
         </div>
 
         {/* Filter tabs */}
