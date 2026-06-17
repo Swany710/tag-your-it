@@ -59,11 +59,35 @@ export default function EditRepPage() {
     });
 
     if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.rep) setRep((current) => current ? { ...current, ...data.rep } : current);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } else {
       const data = await res.json().catch(() => ({}));
       setError(data.error ?? "Failed to save.");
+    }
+
+    setSaving(false);
+  }
+
+  async function handleClearAndReassign() {
+    if (!rep || !confirm("Clear all personal info from this slot? The NFC URL stays the same but all rep details will be wiped so you can assign it to someone new. Fill in the new rep's info and hit Save Changes when ready.")) return;
+
+    setSaving(true);
+    setError("");
+
+    // PUT does a guaranteed hard wipe of every personal field in one DB call
+    const res = await fetch(`/api/reps/${rep.id}`, { method: "PUT" });
+
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.rep) setRep((current) => current ? { ...current, ...data.rep } : current);
+      setSuccess(false);
+      setError("");
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Failed to clear rep.");
     }
 
     setSaving(false);
@@ -232,6 +256,9 @@ export default function EditRepPage() {
               <div className="flex gap-3 pt-1 flex-wrap">
                 <button type="submit" className="btn-primary" disabled={saving}>
                   {saving ? "Saving..." : "Save Changes"}
+                </button>
+                <button type="button" onClick={handleClearAndReassign} className="btn-secondary" disabled={saving}>
+                  Clear &amp; Reassign
                 </button>
                 <button type="button" onClick={handleDeactivate} className="btn-danger">
                   Deactivate

@@ -615,10 +615,11 @@ export default function RepLandingExperience({
     setSubmitting(false);
   }
 
-  function downloadContact() {
+  async function downloadContact() {
     if (previewMode) return;
 
     const lastName = rep.name.split(" ").slice(1).join(" ");
+    // vCard spec requires CRLF line endings — critical for Apple Contacts, new Outlook, Android
     const vcard = [
       "BEGIN:VCARD",
       "VERSION:3.0",
@@ -626,21 +627,44 @@ export default function RepLandingExperience({
       `N:${lastName};${firstName};;;`,
       `ORG:${businessName}`,
       `TITLE:${roleLabel}`,
-      rep.phone ? `TEL;TYPE=CELL:${rep.phone}` : "",
-      rep.officePhone ? `TEL;TYPE=WORK:${rep.officePhone}` : "",
-      rep.email ? `EMAIL:${rep.email}` : "",
+      rep.phone ? `TEL;TYPE=CELL,VOICE:${rep.phone}` : "",
+      rep.officePhone ? `TEL;TYPE=WORK,VOICE:${rep.officePhone}` : "",
+      rep.email ? `EMAIL;TYPE=INTERNET:${rep.email}` : "",
       websiteUrl ? `URL:${websiteUrl}` : "",
-      address ? `ADR;TYPE=WORK:;;${address.replace(/\n/g, "\\n")};;;;` : "",
+      address ? `ADR;TYPE=WORK:;;${address.replace(/\n/g, " ")};;;;` : "",
       "END:VCARD",
     ]
       .filter(Boolean)
-      .join("\n");
+      .join("\r\n");
 
-    const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+    const fileName = `${rep.name.replace(/ /g, "-")}.vcf`;
+    const file = new File([vcard], fileName, { type: "text/vcard" });
+
+    // Web Share API — gives native "Add to Contacts" on iPhone and Android
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.share &&
+      navigator.canShare &&
+      navigator.canShare({ files: [file] })
+    ) {
+      try {
+        await navigator.share({ files: [file], title: rep.name });
+        fetch("/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ repId: rep.id, type: "CONTACT_SAVE" }),
+        }).catch(() => {});
+        return;
+      } catch {
+        // User cancelled or share failed — fall through to plain download
+      }
+    }
+
+    // Desktop fallback — downloads the .vcf file
+    const url = URL.createObjectURL(file);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${rep.name.replace(/ /g, "-")}.vcf`;
+    link.download = fileName;
     link.click();
     URL.revokeObjectURL(url);
 

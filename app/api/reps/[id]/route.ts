@@ -89,3 +89,31 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
 
   return NextResponse.json({ rep });
 }
+
+// PUT /api/reps/[id] - wipe all personal info so the slot can be reassigned
+export async function PUT(_req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const rep = await prisma.rep.update({
+    where: { id: Number(params.id) },
+    data: {
+      name: "Unassigned",
+      phone: null,
+      officePhone: null,
+      email: null,
+      title: null,
+      company: null,
+      bio: null,
+      photoUrl: null,
+      websiteLabel: null,
+      websiteUrl: null,
+      address: null,
+      calLink: null,
+      redirectUrl: null,
+      isActive: false,
+    },
+  });
+
+  return NextResponse.json({ rep });
+}
